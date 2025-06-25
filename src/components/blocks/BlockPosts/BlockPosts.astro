@@ -1,0 +1,65 @@
+---
+import type { BlockPosts, Posts } from '@/types/directusCollection';
+import { getItems } from '@/directus/queries/utils';
+import DirectusImage from '@/components/ui/DirectusImage.astro';
+import Section from '@/layouts/Section.astro';
+import Button from '@/components/ui/Button.astro';
+
+const props = Astro.props as BlockPosts;
+const { headline, tagline, limit, collection } = props;
+
+// Fetch posts from the specified collection
+const posts = await getItems<Posts>(collection as string, Number(limit));
+---
+
+<Section fullWidth class="block-posts py-24 px-4 md:px-16 space-y-16">
+  <!-- Headline -->
+  <div class="space-y-4">
+    {tagline && (
+      <p class="text-sm text-gray-500 uppercase tracking-widest">{tagline}</p>
+    )}
+    {headline && (
+      <h2 class="text-5xl md:text-5xl lg:text-6xl xl:text-8xl leading-tight tracking-tight text-gray-900">
+        {headline}
+      </h2>
+    )}
+  </div>
+<hr />
+
+  <!-- Filters & View Mode Buttons -->
+  <div class="flex justify-between items-center mt-4 mb-6">
+    <div class="flex flex-wrap gap-4">
+      <Button size="sm">All</Button>
+      <Button size="sm">Design</Button>
+      <Button size="sm">Development</Button>
+    </div>
+    <div class="flex items-center gap-4 shrink-0">
+      <Button size="sm">List</Button>
+      <Button size="sm">Card</Button>
+    </div>
+  </div>
+
+  <!-- Table/List View Posts -->
+  <div class="mt-24 divide-y border-t w-full">
+    {posts?.slice(0, Number(limit)).map((post) => (
+      <a
+        id={post.id}
+        href={`/post/${post.slug}`}
+        class="flex py-12 w-full justify-between"
+      >
+      <h3 class="text-lg w-1/3 md:text-xl font-medium text-black">{post.title}</h3>
+      <p class="text-sm w-1/3 text-gray-600 translate-2">{post.description}</p>
+        <div class="text-sm text-gray-500">Read More →</div>
+        <div></div> <!-- empty column for spacing or future metadata -->
+      </a>
+    ))}
+  </div>
+
+  <!-- View All -->
+  <div class="flex justify-center pt-8">
+      <Button>
+        View more {collection}
+      </Button>
+  </div>
+</Section>
+

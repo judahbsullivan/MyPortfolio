@@ -1,0 +1,69 @@
+---
+import { getImage, fileUrl, getThumbnail } from "@/directus/queries/files";
+import type { DirectusFiles } from "@/types/directusCollection";
+import { tw } from "@/lib/tw";
+import { Image } from "astro:assets"; 
+
+
+
+interface Props {
+  image?: DirectusFiles;
+  imageId?: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  format?: string;
+  class?: string;
+}
+
+const {
+  image,
+  imageId: rawId,
+  alt: altProp,
+  width: overrideWidth,
+  height: overrideHeight,
+  class: className,
+  ...rest
+} = Astro.props as Props;
+
+// Safely resolve image ID
+const imageId = rawId ?? image?.id;
+if (!imageId) {
+  console.warn("❌ No image or imageId provided to DirectusImage");
+  return null;
+}
+
+// Attempt to resolve width/height from image or API
+let width = overrideWidth ?? image?.width ?? undefined;
+let height = overrideHeight ?? image?.height ?? undefined;
+let alt = altProp ?? image?.description ?? "";
+
+// Fetch dimensions if missing
+if (width === undefined || height === undefined) {
+  const fetched = await getImage(imageId);
+  width ??= fetched?.width ?? 1;
+  height ??= fetched?.height ?? 1;
+  if (!alt && fetched?.description) alt = fetched.description;
+}
+
+// Final sanity check
+if (typeof width !== "number" || typeof height !== "number") {
+  console.warn("⚠️ DirectusImage missing valid width/height.");
+  return null;
+}
+
+const src = await getThumbnail(imageId, { format: "webp", width, height });
+
+---
+
+<Image
+  src={src}
+  alt={alt}
+  width={width}
+  height={height}
+  loading="lazy"
+  class={tw(className)}
+  {...rest}
+/>
+
+

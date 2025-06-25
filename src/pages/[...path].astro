@@ -1,0 +1,67 @@
+---
+import type { GetStaticPaths } from "astro";
+import PageBuilder from "@/components/builders/PageBuilder.astro";
+import PostBuilder from "@/components/builders/PostBuilder.astro";
+import ProjectBuilder from "@/components/builders/ProjectsBuilder.astro";
+import Layout from '@/layouts/Layout/Layout.astro'
+import { getPages } from "@/directus/queries/page";
+import type { Pages, Posts, Projects } from "@/types/directusCollection";
+import { getArticles } from "@/directus/queries/articles";
+import { getProject } from "@/directus/queries/project";
+
+
+export const getStaticPaths = (async() => {
+  const pages = await getPages();
+  const posts = await getArticles();
+  const projects = await getProject();
+
+
+   // map your normal pages exactly as before
+  const pagePaths = pages.map((page) => ({
+    params: {
+      path: page.permalink?.slice(1) || undefined
+    },
+    props: page as Pages
+  }));
+
+  // force every post to live at /post/<its-slug>
+  const postPaths = posts.map((post) => ({
+    params: {
+      path: `post/${post.slug}`
+    },
+    props: post as Posts 
+  }));
+  const projectPath = projects.map((project) => ({
+    params: {
+      path: `project/${project.slug}`
+    },
+    props: project as Projects 
+  }));
+  return [...pagePaths, ...postPaths, ...projectPath];
+
+
+}) satisfies GetStaticPaths;
+
+const props = Astro.props as Pages;
+const postSlug = Astro.url.pathname.startsWith(`/post/`);
+const projectSlug = Astro.url.pathname.startsWith(`/project/`);
+const isPage = !postSlug === !projectSlug;
+---
+
+<Layout
+  title={props?.title}
+  seo={props?.seo}
+  user_created={props?.user_created}
+  className=""
+>
+  {isPage && (
+  <PageBuilder  pages={props} />
+  )}
+  { postSlug && (
+    <PostBuilder {...props} />
+  )}
+  { projectSlug && (
+    <ProjectBuilder  {...props} />
+  )}
+  </Layout>
+

@@ -1,0 +1,23 @@
+---
+import type { BlockGallery,  BlockGalleryItems } from "@/types/directusCollection"
+import DirectusImage from "@/components/ui/DirectusImage.astro";
+import type { DirectusFile } from "@directus/sdk";
+
+const props = Astro.props as BlockGallery;
+---
+  <section class="py-16 px-4 md:px-12 bg-white">
+      <div class="w-full md:w-1/2 flex flex-col justify-center space-y-6 ">
+        {props.tagline && <p class="text-sm text-gray-500 uppercase tracking-wide">{props.tagline}</p>}
+        {props.headline && <h1 class="text-4xl font-bold text-gray-900">{props.headline}</h1>}
+      </div>
+      <div class=" pt-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid gap-6">
+        {props.items.map((item:  BlockGalleryItems) => {
+          return (
+            <DirectusImage
+              imageId={item.directus_file as string}
+            />
+          )
+        })}
+      </div>
+    </section>
+

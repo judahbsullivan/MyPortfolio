@@ -1,0 +1,86 @@
+---
+import type { BlockButton, BlockHero } from "@/types/directusCollection"
+import Button from "@/components/ui/Button.astro";
+import Section from "@/layouts/Section.astro";
+import DirectusImage from "@/components/ui/DirectusImage.astro";
+import type { DirectusUser } from "@directus/sdk";
+
+const {
+  // layout: rawLayout,
+  tagline,
+  headline,
+  description,
+  button_group,
+  image,
+  user_created,    // <-- grab it here
+}  = Astro.props as BlockHero & { user_created: DirectusUser };
+// 2. Make sure layout is never null/undefined and always one of our keys
+
+const buttons: BlockButton[] =
+  typeof button_group === "object" && Array.isArray(button_group?.buttons)
+    ? (button_group?.buttons as BlockButton[])
+    : [];
+---
+
+<Section 
+  id="hero-block"
+  fullWidth
+  class=" md:px-12">
+  <div
+    class={`max-w-8xl min-h-screen relative mx-auto flex flex-col  w-full justify-between gap-8 `}
+  >
+    <div class={`px-4 w-full flex flex-col pt-12  `}>
+{tagline && (
+  <p class="hero-tagline text-sm text-gray-500 uppercase tracking-wide">{tagline}</p>
+)}
+
+{headline && (
+  <h1 class="hero-headline text-5xl md:text-5xl lg:text-6xl xl:text-8xl leading-tight tracking-tight text-gray-900">{headline}</h1>
+)}
+
+{description && (
+  <p class="hero-description text-base text-pretty max-w-lg text-gray-700">{description}</p>
+)}
+
+     {buttons.length > 0 && (
+      <div class="flex gap-4 mt-4 w-full items-center  flex-wrap">
+        {buttons.map((btn, i) => {
+        const href =
+          btn.page && typeof btn.page !== "string"
+            ? `/pages/${btn.page.permalink ?? btn.page.id}`
+            : btn.post && typeof btn.post !== "string"
+              ? `/posts/${btn.post.slug ?? btn.post.id}`
+              : btn.url ?? "#";
+
+        return (
+        <a href={href} id={`${i}-${btn.id}`}>
+          <Button
+            data-speed=""
+>
+            {btn.label ?? "Click"}
+          </Button>
+        </a>
+        );
+        })}
+
+      </div>
+      )}
+
+      {image && typeof image !== "string" && (
+      <div
+        class="
+        w-3/4 justify-end-safe z-0 flex-1 flex overflow-hidden absolute left-32 md:left-[30%] top-[60%] md:top-[60%] lg:top-[50%]
+        "
+      >
+        <DirectusImage
+          image={image}
+          class="object-cover h-auto"
+        />
+      </div>
+)}
+    </div>
+  </div>
+  <script src="./BlockHero.barba.ts"></script>
+</Section>
+
+

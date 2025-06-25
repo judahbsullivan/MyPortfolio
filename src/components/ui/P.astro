@@ -1,0 +1,17 @@
+---
+import { tw } from '@/lib/tw';
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'p'>  { 
+  className?: string;
+}
+
+const { className, ...props } = Astro.props;
+---
+
+
+<p class={tw('', className)}>
+  <slot />
+</p>
+
+

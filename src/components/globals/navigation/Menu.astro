@@ -1,0 +1,155 @@
+---
+import type { Navigation } from '@/types/directusCollection';
+
+const props = Astro.props as {
+  navItems: Navigation;
+};
+---
+<button id="nav-btn" class="flex gap-1.5 bg-black rounded-full bg-blend-difference items-center justify-center flex-col w-12 h-12 p-2 z-[60] relative">
+  <span class="line top border bg-black w-full bg-blend-difference"></span>
+  <span class="line middle border bg-black w-full bg-blend-difference"></span>
+  <span class="line bottom border bg-black w-full bg-blend-difference"></span>
+</button>
+
+<div
+  id="mobile-nav"
+  class="fixed min-h-[100dvh] left-full top-0 w-full z-50 bg-black text-white px-6 py-10"
+>
+  <ul class="space-y-6 items-left h-screen justify-center gap-20  flex flex-col text-left">
+    {props.navItems?.items.map((item) => {
+    const href =
+      item.url ||
+        (typeof item.page === 'object' && item.page?.permalink) ||
+        (typeof item.post === 'object' && item.post?.slug) ||
+        '#';
+    return (
+    <li id={item.id}>
+      <a href={href} class="links flex flex-col text-4xl md:text-6xl  uppercase text-white items-center">
+        <span class="flex w-full justify-between items-center gap-4">
+          <p class="inline-block w-full"> 
+            {item.title}
+          </p>
+          <span class="page-preview bg-gray-600 rounded h-[1em] w-full scale-x-0 origin-left"></span>
+        </span>
+        <span id="link-line" class="inline-block h-0.5 w-full mt-1 bg-white origin-left scale-x-0"></span>
+      </a>
+    </li>
+    );
+    })}
+  </ul>
+
+</div>
+<script>
+import gsap from 'gsap';
+
+const navBtn = document.querySelectorAll('#nav-btn');
+const navPanel = document.getElementById('mobile-nav');
+const links = document.querySelectorAll('.links');
+const tl = gsap.timeline({ paused: true, reversed: true });
+let isToggle = false;
+const lines = {
+  top: document.querySelector('.line.top'),
+  middle: document.querySelector('.line.middle'),
+  bottom: document.querySelector('.line.bottom'),
+};
+
+
+
+
+tl.to(navPanel, {
+  x: '-100%',
+  duration: 0.8,
+  ease: 'power4.inOut',
+})
+  .to(navBtn, {
+    rotation: 90,
+    duration: 0.8,
+    ease: 'power4.inOut',
+  }, 0)
+  .from(links, {
+    y: 50,
+    opacity: 0,
+    duration: 0.4,
+    stagger: 0.1,
+    ease: 'power2.out',
+  }) 
+  .to(lines.top, {
+    y: 7,
+    rotate: 45,
+    transformOrigin: 'center',
+    duration: 0.4,
+    ease: 'power2.inOut',
+  }, 0)
+  .to(lines.middle, {
+    opacity: 0,
+    duration: 0.3,
+    ease: 'power2.inOut',
+  }, 0)
+  .to(lines.bottom, {
+    y: -7,
+    rotate: -45,
+    transformOrigin: 'center',
+    duration: 0.4,
+    ease: 'power2.inOut',
+  }, 0).to(navBtn,{
+    background: "white",
+
+  },0);
+ 
+
+// Nav toggle behavior
+navBtn.forEach(btn =>
+  btn.addEventListener('click', () => {
+    isToggle = !isToggle;
+    isToggle ? (
+      tl.play(),
+      document.body.style.overflow = 'hidden'
+    ) : (
+        tl.reverse(),
+        document.body.style.overflow = 'auto'
+      );
+  })
+);
+
+const animateScaleX = (
+  el: Element | null,
+  scale: number,
+  origin: 'left' | 'right'
+): void => {
+  if (!el) return;
+  gsap.set(el, { transformOrigin: origin });
+  gsap.to(el, {
+    scaleX: scale,
+    duration: 0.6,
+    ease: scale === 1 ? 'power4.out' : 'power4.in',
+  });
+};
+
+links.forEach(link => {
+  const underline = link.querySelector('[id^="link-line"]');
+  const preview = link.querySelector('.page-preview');
+
+
+  // Close menu when any link is clicked
+links.forEach(link =>
+  link.addEventListener('click', () => {
+    if (!tl.reversed()) {
+      tl.reverse();
+      document.body.style.overflow = 'auto';
+      isToggle = false;
+    }
+  })
+);
+
+  link.addEventListener('mouseenter', () => {
+    animateScaleX(underline, 1, 'left');
+    animateScaleX(preview, 1, 'left');
+  });
+
+  link.addEventListener('mouseleave', () => {
+    animateScaleX(underline, 0, 'right');
+    animateScaleX(preview, 0, 'right');
+  });
+});
+</script>
+

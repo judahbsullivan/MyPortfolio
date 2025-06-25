@@ -1,0 +1,67 @@
+---
+import type { BlockList } from "@/types/directusCollection";
+import Section from "@/layouts/Section.astro";
+import Button from "@/components/ui/Button.astro";
+
+const props = Astro.props as BlockList;
+const { tagline, headline, description, list } = props;
+---
+
+<Section
+  id="block-list"
+  fullWidth
+  class={`flex flex-col  gap-12 px-6 py-52 text-pretty`}
+>
+  <div class="space-y-24 flex flex-col text-left">
+    <div class="flex flex-col w-full justify-between">
+      <div>
+ {tagline && (
+      <p class="text-sm text-gray-500 uppercase tracking-wide">
+        {tagline}
+      </p>
+      )}
+      {headline && (
+      <h4 class="text-3xl lg:text-5xl font-semibold leading-tight text-gray-900">
+        {headline}
+      </h4>
+      )}
+      {description && (
+      <p class="mt-2 text-sm md:text-base max-w-lg text-gray-700 leading-relaxed">
+        {description}
+      </p>
+      )}
+      </div>
+     
+      <div class="">
+      </div>
+    </div>
+
+
+    <!-- Right: list of items -->
+    <div class="flex w-full flex-col gap-8">
+      {list?.map((item) => (
+      <div class="space-y-4 border-b">
+        <h5 class="text-lg font-semibold text-gray-900">
+          {item.tagline}
+        </h5>
+        <p class="text-sm text-gray-700 leading-relaxed">
+          {item.description}
+        </p>
+      </div>
+      ))}
+    </div>
+
+    <a 
+      href={'/project'} 
+      class="flex justify-center items-center w-full"
+    >
+      <Button
+        className="desc-btn" 
+      >
+        { "See my work" }
+      </Button>
+    </a>
+  </div>
+  <script src='./BlockList.barba.ts'/>
+</Section>
+

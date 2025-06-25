@@ -1,0 +1,29 @@
+---
+import { tw } from '@/lib/tw';
+
+const {
+  class: className,
+  fullWidth = false,
+  id,
+  fullHeight = false,
+  background = false
+} = Astro.props;
+
+// choose the right overflow + width combo
+const containerClasses = fullWidth
+  ? 'w-full relative overflow-hidden'
+  : 'max-w-7xl mx-auto px-4 relative overflow-hidden md:px-12';
+
+---
+
+<section
+  id={id}
+  class={tw(`${background} relative z-20`,
+    containerClasses,
+    fullHeight && 'min-h-dvh',
+    className
+  )}
+>
+  <slot />
+</section>
+

@@ -1,0 +1,49 @@
+---
+import { tw } from "@/lib/tw"
+import Head from '@/components/globals/head/Head.astro'
+import Mouse from '@/components/ui/Mouse.astro'
+import Navigation from "@/components/globals/navigation/Navigation.astro";
+import Footer from "@/components/globals/footer/Footer.astro";
+import { getNavigationItems } from "@/directus/queries/globals";
+
+
+const {title, user_created ,seo,description, class:className} = Astro.props;
+const navItems = await getNavigationItems();
+
+
+---
+
+
+
+<html lang="en">
+  <Head 
+    title={title} 
+    description={description}
+    seo={seo}
+  />
+  <body data-barba="wrapper">
+<Mouse />
+    <div id="smooth-wrapper">
+      <Navigation navItems={navItems} />
+        <div
+    id="overlay"
+    class=" overlay fixed inset-0 w-full h-full bg-black z-[9999] pointer-events-none"
+    style="transform-origin: bottom center; transform: scaleY(0);"
+  ></div>
+
+      <main id="smooth-content" data-barba="container" 
+           class={tw(
+        "relative",        /* create a stacking context */
+        "z-10",            /* sit above the footer */
+        className
+      )}
+      style="padding-bottom: 100vh;" 
+      >
+        <slot />
+
+      </main>
+      <Footer user_created={user_created} />
+    </div>
+    <script src="./Layout.barba.ts"></script>
+  </body>
+</html>

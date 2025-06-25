@@ -1,0 +1,102 @@
+---
+import DirectusImage from '@/components/ui/DirectusImage.astro';
+import type {
+  BlockCollection,
+  Posts,
+  Projects
+} from '@/types/directusCollection';
+import Section from '@/layouts/Section.astro';
+import Button from '@/components/ui/Button.astro';
+import { getItems } from '@/directus/queries/utils';
+
+const props = Astro.props as BlockCollection;
+const { tagline, headline, limit, collection } = props;
+
+const items = await getItems<Posts | Projects>(
+  collection as string,
+  Number(limit)
+);
+
+const basePath = collection === 'projects' ? '/project' : '/post';
+const label = collection === 'projects' ? 'Project' : 'Post';
+---
+
+<Section
+  id="block-collection"
+  fullWidth
+  class="flex flex-col items-center justify-center gap-24 px-6 py-52 text-pretty"
+>
+  <!-- Intro -->
+  <div class="flex flex-col gap-4">
+    {tagline && (
+    <p class="text-sm text-gray-500 uppercase tracking-wide">{tagline}</p>
+    )}
+    {headline && (
+    <h4 class="text-3xl lg:text-5xl font-semibold leading-tight text-gray-900">
+      {headline}
+    </h4>
+    )}
+  </div>
+
+  <!-- Cards Grid -->
+  <div class="grid grid-cols-1 gap-6 w-full">
+    {items.map((item) => (
+    <article
+      class="collection-card group relative overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch"
+      id={item.id as string}
+      data-slug={`${basePath}/${item.slug ?? item.id}`}
+    >
+      <div class="flex flex-col gap-2 p-4">
+        <h5 class="card-title font-semibold text-2xl">{item.title ?? item.headline}</h5>
+        {item.description && (
+        <p class="card-description text-sm text-gray-700">{item.description}</p>
+        )}
+        <a
+          href={`${basePath}/${item.slug ?? item.id}`}
+          class="text-pretty font-medium hover:underline"
+        >
+          Read More →
+        </a>
+      </div>
+
+      {item.image ? (
+      <div class="collection-image flex items-center p-4  justify-center relative h-64  w-full bg-black md:h-96 lg:h-[500px] overflow-hidden rounded">
+        <DirectusImage
+          imageId={item.image as string}
+          class=" object-cover  aspect-video m-4 lg:z-0 "
+        />
+
+        <Button
+          className="hidden md:flex absolute left-0 top-0 bottom-0 right-0 z-50 bg-black"
+        >
+          View { item.title}
+        </Button>
+      </div>
+      ) : (
+
+      <div class="collection-image relative h-64  md:h-96 lg:h-[500px] overflow-hidden rounded">
+        <div
+          class=" bg-gray-200 rounded h-64 md:h-96 lg:h-[500px] animate-pulse"
+        />
+        <Button
+          className="hidden md:flex absolute left-0 top-0 bottom-0 right-0 z-50 bg-black"
+        >
+          View { item.title}
+        </Button>
+      </div>
+      )}
+    </article>
+    ))}
+
+  </div>
+
+  <!-- View All Button -->
+  <a href={basePath} class="mt-12">
+    <Button className="desc-btn">View All {label}s</Button>
+  </a>
+
+  <script >
+  import registerBlockCollectionHooks from './BlockCollection.barba.ts';
+  registerBlockCollectionHooks();
+  </script>
+</Section>

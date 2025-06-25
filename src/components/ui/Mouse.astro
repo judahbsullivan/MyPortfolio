@@ -1,0 +1,45 @@
+---
+// src/components/CircleMouse.astro
+// A circular cursor that follows the mouse with Tailwind CSS and GSAP
+---
+
+<div
+  id="mouse-circle"
+  class="pointer-events-none z-50 fixed top-0 left-0 w-8 h-8 rounded-full bg-indigo-500 opacity-75 -translate-x-1/2 -translate-y-1/2"
+></div>
+<div
+  id="mouse-ring"
+  class="pointer-events-none fixed z-50 top-0 left-0 w-8 h-8 rounded-full border-2 border-indigo-500 opacity-0 -translate-x-1/2 -translate-y-1/2 transform"
+></div>
+
+<script>
+import { gsap } from 'gsap';
+
+const circle = document.getElementById('mouse-circle');
+const ring = document.getElementById('mouse-ring');
+
+if (circle) {
+  document.addEventListener('mousemove', (e) => {
+    gsap.to(circle, {
+      x: e.clientX,
+      y: e.clientY,
+      duration: 0.3,
+      ease: 'power2.out',
+    });
+  });
+}
+
+if (ring) {
+  document.addEventListener('click', (e) => {
+    // Position ring at click
+    gsap.set(ring, { x: e.clientX, y: e.clientY });
+    // Animate pulse
+    gsap.fromTo(
+      ring,
+      { scale: 0, opacity: 0.5 },
+      { scale: 2, opacity: 0, duration: 0.6, ease: 'power2.out' }
+    );
+  });
+}
+</script>
+

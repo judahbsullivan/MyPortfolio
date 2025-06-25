@@ -1,0 +1,74 @@
+---
+
+import type { BlockPricing } from "@/types/directusCollection";
+
+const {
+  meta_header_block_pricing,
+  tagline,
+  headline,
+  pricing_cards,
+} = Astro.props as BlockPricing;
+---
+
+
+
+    <section class="py-12 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 text-center">
+        {meta_header_block_pricing && (
+          <span class="text-sm font-medium text-indigo-500 uppercase">
+            {meta_header_block_pricing}
+          </span>
+        )}
+        {tagline && <h2 class="text-3xl mt-2 font-bold">{tagline}</h2>}
+        {headline && <p class="mt-2 text-lg text-gray-600">{headline}</p>}
+
+        <div class="mt-10 grid gap-6 grid-cols-1 md:grid-cols-3">
+          {pricing_cards
+            ?.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+            .map((card) => (
+              <div
+                id={card.id}
+                class={`
+                  "border rounded-xl p-6 bg-white shadow-sm",
+                  card.is_highlighted && "border-indigo-500 shadow-lg"
+                )`}
+              >
+                {card.badge && (
+                  <div class="text-xs font-bold text-indigo-500 uppercase mb-2">
+                    {card.badge}
+                  </div>
+                )}
+                <h3 class="text-xl font-semibold">{card.title}</h3>
+                {card.price && (
+                  <p class="text-3xl font-bold text-indigo-600 mt-2">
+                    {card.price}
+                  </p>
+                )}
+                {card.description && (
+                  <p class="text-sm text-gray-500 mt-2">
+                    {card.description}
+                  </p>
+                )}
+                {card.features && card.features.length > 0 && (
+                  <ul class="mt-4 text-sm text-left text-gray-600 list-disc list-inside">
+                    {card.features.map((feature: any, index: any) => (
+                      <li id={index}>{feature}</li>
+                    ))}
+                  </ul>
+                )}
+                {card.button && (
+                  <a
+                    href={card.button.url}
+                    class="inline-block mt-6 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                  >
+                    {card.button.label}
+                  </a>
+                )}
+              </div>
+            ))}
+        </div>
+      </div>
+    </section>
+
+
+

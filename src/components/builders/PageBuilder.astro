@@ -1,0 +1,24 @@
+---
+import Section from '@/layouts/Section.astro';
+import type { Pages } from '@/types/directusCollection';
+import BlockBuilder from './BlockBuilder.astro';
+
+
+
+
+const pages = Astro.props.pages as Pages;
+const background = pages?.blocks?.map((block) => block.background);
+const bgClass = background
+  ? 'bg-muted'
+  : 'bg-muted';
+---
+
+<Section 
+  fullWidth
+  fullHeight
+  className='px-0'
+  background={bgClass}
+>
+<BlockBuilder blocks={pages?.blocks} user_created={pages?.user_created as any} />
+</Section>
+

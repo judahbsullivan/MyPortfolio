@@ -1,0 +1,22 @@
+---
+// src/components/Heading.astro
+import type { HTMLAttributes } from "astro/types";
+
+type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5";
+
+interface Props extends HTMLAttributes<HeadingTag> {
+  as?: HeadingTag;
+  class?: string;
+}
+
+const {
+  as = "h1",
+  class: className,
+  ...rest
+} = Astro.props as Props;
+---
+
+<set:tag name={as} class={className} {...rest}>
+  <slot />
+</set:tag>
+

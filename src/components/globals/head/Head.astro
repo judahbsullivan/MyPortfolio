@@ -1,0 +1,21 @@
+---
+import "@/styles/global.css"
+import MetaTag from './MetaTag.astro';
+interface Props {
+  title?: string;
+  description?: string;
+  seo?: any;
+  globals?: {
+    author?: string | "Judah Sullivan";
+
+  }
+}
+const { title, seo, description ,globals} = Astro.props;
+const author = globals?.author ? globals.author : "Judah Sullivan";
+---
+<head>
+  <MetaTag charset="UTF-8"/>
+  <MetaTag name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="../../../scripts/initAnimations.ts" ></script>
+  <title>{` ${title} | ${author}`}</title>
+</head>

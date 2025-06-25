@@ -1,0 +1,58 @@
+---
+import { tw } from '@/lib/tw';
+import type { PageBlocks } from '@/types/directusCollection';
+import type { DirectusUser } from '@directus/sdk';
+
+interface Props {
+  blocks: PageBlocks[];
+  user_created: DirectusUser;
+  background?: boolean
+}
+
+const props = Astro.props as Props & {user_created: DirectusUser};
+const { blocks, user_created } = props;
+
+const blockMap: Record<string, () => Promise<{ default: any }>> = {
+  block_hero: () => import('../blocks/BlockHero/BlockHero.astro'),
+  block_form: () => import('../blocks/BlockForm/BlockForm.astro'),
+  block_richtext: () => import('../blocks/BlockRichText/BlockRichText.astro'),
+  block_gallery: () => import('../blocks/BlockGallery/BlockGallery.astro'),
+  block_pricing: () => import('../blocks/BlockPricing/BlockPricing.astro'),
+  block_description: () => import('../blocks/BlockDescription/BlockDescription.astro'),
+  block_posts: () => import('../blocks/BlockPosts/BlockPosts.astro'),
+  block_collection: () => import("../blocks/BlockCollection/BlockCollection.astro"),
+  block_timeline: () => import('../blocks/BlockTimeline/BlockTimeline.astro'),
+  block_heading: () => import('../blocks/BlockHeading/BlockHeading.astro'),
+  block_list: () => import('../blocks/BlockList/BlockList.astro'),
+  block_projects: () => import('../blocks/BlockProjects/BlockProjects.astro'),
+};
+---
+
+{ blocks?.map(async (block, index) => {
+  const collection = block.collection;
+  if (!collection || typeof collection !== 'string') {
+    console.warn('❌ Block missing or invalid collection:', block);
+    return null;
+  }
+
+const loader = blockMap[collection];
+  if (!loader) {
+    console.warn(`⚠️ No component found for block type "${collection}"`);
+    return null;
+  }
+
+  try {
+    const mod = await loader();
+    const Component = mod.default;
+    return ( 
+    <Component 
+  {...block.item}  
+  key={index}  
+  user_created={user_created}
+/>
+    )} catch (err) {
+    console.error(`❌ Error loading block "${collection}":`, err);
+    return <div>Error loading block: {collection}</div>;
+  }
+})}
+

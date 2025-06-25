@@ -1,0 +1,37 @@
+---
+import { tw } from "@/lib/tw";
+import type { HTMLAttributes } from "astro/types";
+
+type ButtonType = "button";
+type Size = "xs" | "sm" | "md" | "lg";
+
+interface Props extends HTMLAttributes<ButtonType> {
+  id?: string;
+  className?: string;
+  type?: ButtonType;
+  size?: Size;
+}
+
+const { className, type = "button", size = "lg", ...props } = Astro.props as Props;
+
+const sizeClasses = {
+  xs: "w-12 sm:w-16",         // 48px on mobile, 64px on small+
+  sm: "w-16 sm:w-26",         // 64px to 96px
+  md: "w-24 sm:w-48",         // 96px to 192px
+  lg: "w-32 sm:w-[15.5rem]",  // 128px to 248px
+}[size];
+---
+
+<button
+  id={Astro.props.id}
+  type={type}
+  class={tw(
+    "aspect-square px-2 rounded-full flex items-center justify-center bg-gray-900/50  text-white font-medium hover:bg-gray-900/90 transition",
+    sizeClasses,
+    className
+  )}
+  {...props}
+>
+  <slot />
+</button>
+
