@@ -1,0 +1,17 @@
+---
+
+const {props} = Astro.props;
+---
+
+
+
+<a
+  id={`${props?.id }`}
+  href={`/project/${props?.slug}`}
+  class="flex py-12 w-full justify-between"
+>
+  <h3 class="text-lg w-1/3 md:text-xl font-medium text-black">{props?.title}</h3>
+  <p class="text-sm w-1/3 text-gray-600 translate-2">{props?.description}</p>
+  <div class="text-sm text-gray-500">Read More →</div>
+  <div></div> <!-- empty column for spacing or future metadata -->
+</a>

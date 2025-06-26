@@ -30,16 +30,32 @@ const buttons: BlockButton[] =
     class={`max-w-8xl min-h-screen relative mx-auto flex flex-col  w-full justify-between gap-8 `}
   >
     <div class={`px-4 w-full flex flex-col pt-12  `}>
-{tagline && (
-  <p class="hero-tagline text-sm text-gray-500 uppercase tracking-wide">{tagline}</p>
+      {tagline && (
+      <p
+        class=" inline-block transition-transform overflow-hidden text-sm text-gray-500 uppercase tracking-wide"
+      >
+        <span class="hero-tagline inline-block transition-transform  translate-y-full">
+        {tagline}
+        </span>
+      </p>
 )}
-
-{headline && (
-  <h1 class="hero-headline text-5xl md:text-5xl lg:text-6xl xl:text-8xl leading-tight tracking-tight text-gray-900">{headline}</h1>
+      {headline && (
+      <h1
+        class=" inline-block overflow-hidden transition-transform text-5xl md:text-5xl lg:text-6xl xl:text-8xl leading-tight tracking-tight text-gray-900"
+      >
+        <span class="hero-headline inline-block transition-transform  translate-y-full">
+        {headline}
+        </span>
+      </h1>
 )}
-
-{description && (
-  <p class="hero-description text-base text-pretty max-w-lg text-gray-700">{description}</p>
+      {description && (
+      <p
+        class=" overflow-hidden inline-block transition-transform text-base text-pretty max-w-lg text-gray-700"
+      >
+        <span class="hero-description inline-block transition-transform  translate-y-full">
+        {description}
+        </span>
+      </p>
 )}
 
      {buttons.length > 0 && (
@@ -55,8 +71,9 @@ const buttons: BlockButton[] =
         return (
         <a href={href} id={`${i}-${btn.id}`}>
           <Button
+            id="hero-btn"
             data-speed=""
->
+            className="opacity-0">
             {btn.label ?? "Click"}
           </Button>
         </a>
@@ -74,7 +91,7 @@ const buttons: BlockButton[] =
       >
         <DirectusImage
           image={image}
-          class="object-cover h-auto"
+          class="object-cover opacity-0 h-auto hero-image"
         />
       </div>
 )}

@@ -1,62 +1,80 @@
 ---
 import type { Projects, BlockProjects } from '@/types/directusCollection';
+import ItemList from '@/components/ui/ItemList.astro';
+import ItemCard from '@/components/ui/ItemCard.astro';
 import { getItems } from '@/directus/queries/utils';
 import Section from '@/layouts/Section.astro';
 import Button from '@/components/ui/Button.astro';
 
-const { headline, tagline, limit, collection } = Astro.props as BlockProjects 
+const { headline, tagline, limit, collection } = Astro.props as BlockProjects;
 const projects = await getItems<Projects>(collection, limit);
 ---
 
-
 <Section fullWidth class="block-projects py-24 px-4 md:px-16 space-y-16">
   <!-- Headline -->
-  <div class="space-y-4">
+  <div class="space-y-4 overflow-hidden">
     {tagline && (
-      <p class="text-sm text-gray-500 uppercase tracking-widest">{tagline}</p>
+      <p>
+        <span class="uppercase text-sm text-gray-500 tracking-widest inline-block transition-transform translate-y-full">
+          {tagline}
+        </span>
+      </p>
     )}
     {headline && (
-      <h2 class="text-5xl md:text-5xl lg:text-6xl xl:text-8xl leading-tight tracking-tight text-gray-900">
-        {headline}
+      <h2 class="overflow-hidden">
+        <span class="text-5xl md:text-5xl lg:text-6xl xl:text-8xl leading-tight tracking-tight text-gray-900 inline-block transition-transform translate-y-full">
+          {headline}
+        </span>
       </h2>
     )}
   </div>
-<hr />
+
+  <hr />
 
   <!-- Filters & View Mode Buttons -->
   <div class="flex justify-between items-center mt-4 mb-6">
     <div class="flex flex-wrap gap-4">
-      <Button size="sm">All</Button>
-      <Button size="sm">Design</Button>
-      <Button size="sm">Development</Button>
+      <Button size="sm" className="inline-block scale-0 transition-transform">All</Button>
+      <Button size="sm" className="inline-block scale-0 transition-transform">Design</Button>
+      <Button size="sm" className="inline-block scale-0 transition-transform">Development</Button>
     </div>
     <div class="flex items-center gap-4 shrink-0">
-      <Button size="sm">List</Button>
-      <Button size="sm">Card</Button>
+      <Button size="sm" className="inline-block scale-0 transition-transform">List</Button>
+      <Button size="sm" className="inline-block scale-0 transition-transform">Card</Button>
     </div>
   </div>
 
-  <!-- Table/List View projects -->
-  <div class="mt-24 divide-y border-t w-full">
-    {projects?.slice(0, Number(limit)).map((post) => (
-      <a
-      id={`${post.id }`}
-        href={`/project/${post.slug}`}
-        class="flex py-12 w-full justify-between"
-      >
-      <h3 class="text-lg w-1/3 md:text-xl font-medium text-black">{post.title}</h3>
-      <p class="text-sm w-1/3 text-gray-600 translate-2">{post.description}</p>
-        <div class="text-sm text-gray-500">Read More →</div>
-        <div></div> <!-- empty column for spacing or future metadata -->
-      </a>
+  <!-- List View -->
+  <div class="mt-24 divide-y border-t w-full space-y-4">
+    {projects.slice(0, Number(limit)).map(post => (
+      <div class="overflow-hidden">
+        <div class="inline-block translate-y-full transition-transform">
+          <ItemList props={post} />
+        </div>
+      </div>
     ))}
   </div>
 
-  <!-- View All -->
-  <div class="flex justify-center pt-8">
+  <!-- Card View -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+    {projects.slice(0, Number(limit)).map(project => (
+      <div class="overflow-hidden">
+        <div class="inline-block translate-y-full transition-transform w-full">
+          <ItemCard {...project} />
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- View All Button -->
+  <div class="flex justify-center pt-8 overflow-hidden">
+    <div class="inline-block scale-0 transition-transform">
       <Button>
         View more {collection}
       </Button>
+    </div>
   </div>
+
+  <script src="./BlockProjects.barba.ts"></script>
 </Section>
 
