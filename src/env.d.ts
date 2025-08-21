@@ -1,5 +1,3 @@
-import type barba from "@barba/core";
-
 declare module "@barba/core" {
   const barba: any;
   export default barba;
