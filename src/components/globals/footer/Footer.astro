@@ -8,83 +8,34 @@ const today = new Date().getFullYear();
 
 <footer
   class="
-    fixed inset-x-0 bottom-0  
     h-screen
-    bg-foreground z-0 flex items-center justify-between
+    bg-foreground z-10 flex items-center justify-between
     text-secondary
     px-6
-    flex-col
+    flex-col pointer-events-auto
   "
 >
-  <div class="flex flex-col md:flex-row justify-between pt-20 text-center md:text-left w-full">
-    <!-- Links -->
-    <div class="flex gap-4 w-full justify-flex-row">
-      <div class="flex flex-col gap-4">
-        <p class="text-2xl">Links:</p>
-        <div class="flex flex-col text-sm gap-2 capitalize">
-          <a href="/">home</a>
-          <a href="/about">about</a>
-          <a href="/blog">blog</a>
-          <a href="/projects">projects</a>
-          <a href="/contact">contact me</a>
-        </div>
-      </div>
+  <div class="w-full z-20 text-center h-[100%] justify-around md:justify-center items-center-safe flex flex-col gap-6"> 
 
-      <!-- Socials -->
-      <div class="flex flex-col gap-4"> 
-        <p class="text-2xl">Socials:</p>
-        <div class="flex flex-col gap-2 text-sm capitalize">
-          <a href="/">Facebook</a>
-          <a href="/">Instagram</a>
-          <a href="/">TikTok</a>
-          <a href="/">YouTube</a>
-          <a href="/">Github</a>
+        <h1 class="hero-headline tracking-tighter text-6xl md:text-[10vw]  text-pretty break-keep leading-[.99] inline-block uppercase text-center">
+      Lets Work Together!</h1>
+<div class="flex items-center gap-6 md:gap-10 text-xl text-center md:text-2xl flex-wrap capitalize">
+          <a  
+            target="_blank"
+            href="https://linkedin.com/in/judahsullivan">Linkedin</a>
+          <a  
+            target="_blank"
+            href="https://profile.indeed.com/?hl=en_US&co=US&from=gnav-homepage">Indeed</a>
+          <a  
+            target="_blank"
+            href="https://youtube.com/judahsullivan">YouTube</a>
+          <a 
+            target="_blank"
+            href="https://github.com/judahbsullivan">Github</a>
         </div>
-      </div>
-    </div>
-
-    {user_created&& ( 
-    <!-- User profile now matches heading + text styles -->
-    <div class="flex flex-col gap-4 items-center md:items-start">
-      <p class="text-2xl font-semibold">
-        {user_created?.first_name} {user_created?.last_name}
-      </p>
-      <p class="text-sm">{user_created.title}</p>
-      <p class="text-sm">{user_created.location}</p>
-      {user_created.tags.length > 0 && (
-        <div class="mt-2 flex flex-wrap gap-2">
-          {user_created.tags.map((tag: any) => (
-            <span
-              class="
-                text-xs uppercase
-                bg-secondary/20
-                text-secondary
-                px-2 py-1
-                rounded
-              "
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-    )} 
   </div>
 
-  <div class="w-full text-center items-center-safe flex flex-col gap-6"> 
-    <h1 class="text-4xl md:text-6xl lg:text-9xl">Let’s Get In Touch</h1>
-    <a
-      href="/contact"
-    >
-      <Button className="desc-btn">
-
-        Lets Talk
-      </Button>
-    </a>
-  </div>
-
-  <div class="w-full flex justify-between items-center py-6 text-lg">
+  <div class="w-full flex-col md:flex-row flex justify-between items-center py-6 text-lg">
     <p class="">Authored By: Judah Sullivan</p>
     <div class="flex  items-center gap-6">
           <p class="relative">Copyright <span class="text-xs -right-3 absolute">©</span> </p>

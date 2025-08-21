@@ -25,78 +25,29 @@ const buttons: BlockButton[] =
 <Section 
   id="hero-block"
   fullWidth
-  class=" md:px-12">
-  <div
-    class={`max-w-8xl min-h-screen relative mx-auto flex flex-col  w-full justify-between gap-8 `}
-  >
-    <div class={`px-4 w-full flex flex-col pt-12  `}>
-      {tagline && (
-      <p
-        class=" inline-block transition-transform overflow-hidden text-sm text-gray-500 uppercase tracking-wide"
-      >
-        <span class="hero-tagline inline-block transition-transform  translate-y-full">
-        {tagline}
-        </span>
-      </p>
-)}
-      {headline && (
-      <h1
-        class=" inline-block overflow-hidden transition-transform text-5xl md:text-5xl lg:text-6xl xl:text-8xl leading-tight tracking-tight text-gray-900"
-      >
-        <span class="hero-headline inline-block transition-transform  translate-y-full">
-        {headline}
-        </span>
-      </h1>
-)}
-      {description && (
-      <p
-        class=" overflow-hidden inline-block transition-transform text-base text-pretty max-w-lg text-gray-700"
-      >
-        <span class="hero-description inline-block transition-transform  translate-y-full">
-        {description}
-        </span>
-      </p>
-)}
+  class=" ">
+   <div class="flex w-full px-6 items-center flex-col justify-between h-screen pt-10 pb-6  gap-24">
+        <h1 class="hero-headline tracking-tighter text-7xl md:text-[10vw] inline-block text-pretty break-keep leading-[.99] uppercase text-center">
+          Creative Systems, Scalable Code
+        </h1>
 
-     {buttons.length > 0 && (
-      <div class="flex gap-4 mt-4 w-full items-center  flex-wrap">
-        {buttons.map((btn, i) => {
-        const href =
-          btn.page && typeof btn.page !== "string"
-            ? `/pages/${btn.page.permalink ?? btn.page.id}`
-            : btn.post && typeof btn.post !== "string"
-              ? `/posts/${btn.post.slug ?? btn.post.id}`
-              : btn.url ?? "#";
+        <div class="flex gap-2 items-end  w-full flex-col">
+          <div class="md:w-1/2">
+            <h2 class="text-lg uppercase tracking-wider text-neutral-500 mb-1">
+              Software Engineer | Frontend Architect | Digital Craftsman
+            </h2>
+            <h4 class=" text-4xl md:text-[5vw] uppercase font-light leading-tight tracking-tighter">
+              Judah Sullivan
+            </h4>
+            <p>Located Currently in Houston, TX</p>
+            <p class="">Currently Open To Work! </p>
 
-        return (
-        <a href={href} id={`${i}-${btn.id}`}>
-          <Button
-            id="hero-btn"
-            data-speed=""
-            className="opacity-0">
-            {btn.label ?? "Click"}
-          </Button>
-        </a>
-        );
-        })}
-
+            <p class="text-2xl underline mt-3 font-extrabold uppercase">
+              Lets Connect
+            </p>
+          </div>
+        </div>
       </div>
-      )}
-
-      {image && typeof image !== "string" && (
-      <div
-        class="
-        w-3/4 justify-end-safe z-0 flex-1 flex overflow-hidden absolute left-32 md:left-[30%] top-[60%] md:top-[60%] lg:top-[50%]
-        "
-      >
-        <DirectusImage
-          image={image}
-          class="object-cover opacity-0 h-auto hero-image"
-        />
-      </div>
-)}
-    </div>
-  </div>
   <script src="./BlockHero.barba.ts"></script>
 </Section>
 

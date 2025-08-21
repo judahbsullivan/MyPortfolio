@@ -789,7 +789,7 @@ export type Projects = {
   content?: string | null;
   description?: string | null;
   id: number;
-  image?: (string & DirectusFiles) | null;
+  cover_image?: (string & DirectusFiles) | null;
   meta_content: string;
   meta_seo: string;
   meta_tabs: string;
@@ -873,4 +873,3 @@ export type CustomDirectusTypes = {
   projects: Projects[];
   redirects: Redirects[];
 };
-

@@ -24,21 +24,21 @@ const posts = await getItems<Posts>(collection as string, Number(limit));
       </h2>
     )}
   </div>
-<hr />
-
-  <!-- Filters & View Mode Buttons -->
-  <div class="flex justify-between items-center mt-4 mb-6">
-    <div class="flex flex-wrap gap-4">
-      <Button size="sm">All</Button>
-      <Button size="sm">Design</Button>
-      <Button size="sm">Development</Button>
-    </div>
-    <div class="flex items-center gap-4 shrink-0">
-      <Button size="sm">List</Button>
-      <Button size="sm">Card</Button>
-    </div>
-  </div>
-
+<!-- <hr /> -->
+  <!---->
+  <!-- <!-- Filters & View Mode Buttons -->
+  <!-- <div class="flex justify-between items-center mt-4 mb-6"> -->
+  <!--   <div class="flex flex-wrap gap-4"> -->
+  <!--     <Button size="sm">All</Button> -->
+  <!--     <Button size="sm">Design</Button> -->
+  <!--     <Button size="sm">Development</Button> -->
+  <!--   </div> -->
+  <!--   <div class="flex items-center gap-4 shrink-0"> -->
+  <!--     <Button size="sm">List</Button> -->
+  <!--     <Button size="sm">Card</Button> -->
+  <!--   </div> -->
+  <!-- </div> -->
+  <!---->
   <!-- Table/List View Posts -->
   <div class="mt-24 divide-y border-t w-full">
     {posts?.slice(0, Number(limit)).map((post) => (

@@ -68,13 +68,16 @@ export default function registerLayoutBarba() {
         },
 
         async enter({ next }) {
-          console.log("[layout.barba] enter → LayoutEnter (overlay scaling down)");
+          console.log(
+            "[layout.barba] enter → LayoutEnter (overlay scaling down)",
+          );
           LayoutEnter(next.container);
         },
 
         async afterEnter({ next }) {
           console.log("[layout.barba] afterEnter → unblocked container");
 
+          window.scrollTo({ top: 0, left: 0, behavior: "auto" });
           requestAnimationFrame(() => {
             if ((window as any).initSmoother) {
               (window as any).initSmoother();
@@ -90,4 +93,3 @@ export default function registerLayoutBarba() {
 }
 
 registerLayoutBarba();
-

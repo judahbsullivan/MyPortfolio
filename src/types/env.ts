@@ -1,5 +1,1 @@
-
-
-
-
-export const apiUrl: string = "https://judahbsullivan.directus.app/" 
+export const apiUrl: string = "https://judahsullivan.directus.app/";

@@ -9,10 +9,11 @@ const props = Astro.props as Projects;
 const {
   title,
   description,
+  cover_image,
   content,
-  image,
   published_At
 } = props;
+console.log(cover_image)
 ---
 
 <Section 
@@ -23,12 +24,25 @@ const {
     <p class="text-sm text-gray-500 uppercase tracking-widest">
       {published_At && new Date(published_At).toLocaleDateString()}
     </p>
-    <h1 class="text-5xl md:text-6xl font-semibold tracking-tight text-gray-900">
+  
+   <h1 class="tracking-tighter text-[10vw] inline-block text-pretty break-keep leading-[.99] uppercase text-center">
       {title}
-    </h1>
+        </h1>
+
+
     {description && (
       <p class="text-lg text-gray-600">{description}</p>
     )}
+    
+  {cover_image && (
+    <div class="w-full bg-accent rounded-xl flex items-center justify-center">
+      <DirectusImage
+        imageId={cover_image}
+      class="object-cover w-full rounded"
+
+      />
+    </div>
+  )}
   </div>
   <div class="py-12 relative z-0 w-full">
     <hr class="relative z-0" />
@@ -40,17 +54,6 @@ const {
     </Button>
   </div>
 
-  <!-- Image -->
-  {image && (
-    <div class="w-full">
-      <DirectusImage
-        imageId={image}
-        class="rounded-lg  object-cover"
-      />
-    </div>
-  )}
-
-  <!-- Content -->
   {content && (
     <div class="prose prose-lg max-w-3xl text-gray-800">
       <Fragment set:html={content} />

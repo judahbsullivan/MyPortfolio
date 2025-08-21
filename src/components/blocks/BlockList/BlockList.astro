@@ -3,65 +3,107 @@ import type { BlockList } from "@/types/directusCollection";
 import Section from "@/layouts/Section.astro";
 import Button from "@/components/ui/Button.astro";
 
-const props = Astro.props as BlockList;
+const experienceList = [
+  {
+    id: "1",
+    title: "Software Engineer I",
+    company: "Hope Media Group",
+    location: "Houston, USA",
+    date: "Jan 2023 – Present",
+    bullets: [
+      "Architected and maintained a multi-tenant Directus CMS serving 7+ sites with 100k+ monthly visits",
+      "Enhanced rendering performance by 30% with targeted Next.js optimizations",
+      "Engineered persistent audio playback with 95% uptime across routes",
+      "Automated Docker-based deployments and CI/CD pipelines, cutting setup time by 70%",
+      "Collaborated asynchronously with UX, backend, and QA teams across the US and EU",
+    ],
+  },
+  {
+    id: "2",
+    title: "Frontend Developer",
+    company: "NarrowStack",
+    location: "New Orleans, Remote",
+    date: "Jan 2021 – Jan 2022",
+    bullets: [
+      "Developed 30+ reusable React components for a SaaS product suite",
+      "Reduced Time to Interactive by 25% via code-splitting and lazy loading",
+      "Worked closely with founders to deliver UI iterations on tight deadlines",
+      "Integrated GitHub Actions CI into a global team workflow",
+    ],
+  },
+  {
+    id: "3",
+    title: "Independent Consultant (Solo Full Stack Developer)",
+    company: "Freelance",
+    location: "New Orleans, Remote",
+    date: "Jan 2021 – Jan 2023",
+    bullets: [
+      "Delivered 12+ client projects end-to-end with Directus and Next.js",
+      "Accelerated load times by 45% using static optimizations and caching",
+      "Built interactive dashboards and animations with Astro + Barba.js",
+      "Facilitated async client collaboration using Notion and Asana",
+    ],
+  },
+  {
+    id: "4",
+    title: "QA Analyst → Junior Developer",
+    company: "Nuro",
+    location: "Houston, USA",
+    date: "Jan 2018 – Jan 2020",
+    bullets: [
+      "Authored Python scripts and dashboards, reducing QA manual reviews by 60%",
+      "Developed internal tools for autonomous vehicle data analysis",
+      "Coordinated cross-team issue triaging and resolution efforts",
+    ],
+  },
+];
+
+const props: BlockList = {
+  tagline: "Experience",
+  headline: "My Work Journey",
+  description:
+    "A track record of building scalable platforms, crafting interfaces, and contributing to products across startups, enterprises, and freelance projects.",
+  list: experienceList,
+};
+
 const { tagline, headline, description, list } = props;
 ---
 
 <Section
   id="block-list"
   fullWidth
-  class={`flex flex-col  gap-12 px-6 py-52 text-pretty`}
+  class="flex flex-col gap-12 px-6 py-52 text-pretty"
 >
-  <div class="space-y-24 flex flex-col text-left">
-    <div class="flex flex-col w-full justify-between">
-      <div>
- {tagline && (
-      <p class="text-sm text-gray-500 uppercase tracking-wide">
-        {tagline}
-      </p>
-      )}
-      {headline && (
-      <h4 class="text-3xl lg:text-5xl font-semibold leading-tight text-gray-900">
-        {headline}
-      </h4>
-      )}
-      {description && (
-      <p class="mt-2 text-sm md:text-base max-w-lg text-gray-700 leading-relaxed">
+   <header class="w-full">
+    <h2 class="text-xl relative uppercase desc-text tracking-wider text-neutral-500 mb-1">
+      {tagline}
+    </h2>
+    <h4 class="text-5xl md:text-[5vw] uppercase desc-title font-light leading-tight tracking-tighter">
+      {headline}
+    </h4>
+    <div class="flex gap-6 flex-wrap mt-5 max-w-2xl">
+          <p class="text-2xl font-thin desc-text ">
         {description}
       </p>
-      )}
-      </div>
-     
-      <div class="">
-      </div>
     </div>
+  </header>
 
 
-    <!-- Right: list of items -->
-    <div class="flex w-full flex-col gap-8">
-      {list?.map((item) => (
-      <div class="space-y-4 border-b">
-        <h5 class="text-lg font-semibold text-gray-900">
-          {item.tagline}
-        </h5>
-        <p class="text-sm text-gray-700 leading-relaxed">
-          {item.description}
-        </p>
+  <div class="flex flex-col gap-16 w-full">
+    {list.map((job) => (
+      <div class="flex flex-col gap-4">
+        <h4 class="text-4xl font-semibold desc-title">
+          {job.title} <span class="font-light">@ {job.company}</span>
+        </h4>
+        <span class="text-lg desc-title text-neutral-500">
+          {job.location} | {job.date}
+        </span>
+        <ul  class="desc-text list-disc pl-6 space-y-2">
+          {job.bullets.map((point) => (
+            <li>{point}</li>
+          ))}
+        </ul>
       </div>
-      ))}
-    </div>
-
-    <a 
-      href={'/project'} 
-      class="flex justify-center items-center w-full"
-    >
-      <Button
-        className="desc-btn" 
-      >
-        { "See my work" }
-      </Button>
-    </a>
+    ))}
   </div>
-  <script src='./BlockList.barba.ts'/>
 </Section>
-

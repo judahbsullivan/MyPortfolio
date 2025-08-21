@@ -34,10 +34,9 @@ const navItems = await getNavigationItems();
       <main id="smooth-content" data-barba="container" 
            class={tw(
         "relative",        /* create a stacking context */
-        "z-10",            /* sit above the footer */
+        "z-20",            /* sit above the footer */
         className
       )}
-      style="padding-bottom: 100vh;" 
       >
         <slot />
 

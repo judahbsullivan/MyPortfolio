@@ -1,4 +1,6 @@
 ---
+import MasonGrid from '@/components/ui/MasonGrid.astro'
+import BlockExperience from '@/components/blocks/BlockList/BlockList.astro'
 import Button from "@/components/ui/Button.astro";
 import Section from "@/layouts/Section.astro";
 import type { BlockButton, BlockDescription } from "@/types/directusCollection";
@@ -10,60 +12,63 @@ const buttons: BlockButton[] =
   typeof button_group === "object" && Array.isArray(button_group?.buttons)
     ? (button_group.buttons as BlockButton[] )
     : [];
+
+const images: PinterestImage[] = [
+  {
+    id: "hope-media-group",
+    imageUrl: "a31c6231-8b2c-4f90-a6a7-c842e08c5240", // replace with your project cover
+    title: "Hope Media Group – Full Stack Platform Overhaul",
+    width: 1200,
+    height: 800,
+    tags: ["FullStack", "CMS", "Next.js", "React", "AWS"],
+    slug: '/project/hopestack',
+  },
+  // Add other projects here
+];
+
+const categories = ["Architecture", "Nature", "Workspace", "Abstract", "Fashion"];
 ---
 
 <Section
   id="block-description"
   fullWidth
-  class={`
-    flex flex-col items-center justify-center
-    gap-12 px-6 py-24 md:py-52 text-pretty
-    md:flex-row md:gap-24 md:justify-between
-  `}
+  class={`min-h-screen py-12 w-full flex flex-col  items-center justify-between gap-5  md:justify-between px-6
+`}
 >
-  <div class="grid grid-cols-1 lg:grid-cols-3 md:gap-12">
-    <!-- Left column: tagline + headline -->
-    <div class="flex flex-col col-span-2 gap-4">
-      {tagline && (
-        <p class="desc-tagline text-sm text-gray-500 uppercase tracking-wide">
-          {tagline}
-        </p>
-      )}
-      {headline && (
-        <h4 class="desc-title text-3xl lg:text-5xl leading-normal font-semibold text-gray-900 w-full">
-          {headline}
-        </h4>
-      )}
-    </div>
-
-    <!-- Right column: description + button -->
-    <div class="flex flex-col mt-6 md:mt-12 h-full justify-center text-pretty items-center text-left gap-6">
-      {description && (
-        <p class="desc-text text-sm md:text-base max-w-sm md:max-w-lg text-gray-700 text-pretty leading-relaxed">
-          {description}
-        </p>
-      )}
-
-      {buttons.length > 0 && (
-        <div class="flex flex-wrap justify-end md:justify-center w-full">
-          {buttons.map((btn, i) => {
-            const href =
-              btn.page && typeof btn.page !== "string"
-                ? `/pages/${btn.page.permalink ?? btn.page.id}`
-                : btn.post && typeof btn.post !== "string"
-                ? `/posts/${btn.post.slug ?? btn.post.id}`
-                : btn.url ?? "#";
-            return (
-              <a href={href} id={`${i}-${btn.id}`} class="overflow-hidden">
-                <Button className="desc-btn translate-full transition-all opacity-0">{btn.label ?? "Click"}</Button>
-              </a>
-            );
-          })}
+ <div class="w-full flex flex-col justify-start">
+        <div class="max-w-6xl">
+          <h2 class="text-xl desc-text  relative uppercase tracking-wider text-neutral-500 mb-1  ">
+        {tagline}
+          </h2>
+      <h4 
+        id=''
+        class=" desc-title text-5xl md:text-[5vw] leading-[.89]  uppercase font-light ">
+        {headline}
+          </h4>
         </div>
-      )}
-    </div>
-  </div>
+      </div>
+      <div class="w-full flex justify-end">
+        <div class="max-w-2xl space-y-6">
+      <p  
+        id=''
+        class=" desc-text text-2xl font-thin mt-24">
+        {description}
+          </p>
+          <!-- <a class="capitalize text-2xl" href="/about"> -->
+          <!--   More About me -->
+          <!-- </a> -->
+        </div>
 
-  <script src="./BlockDescription.barba.ts"></script>
+    </div>
+<BlockExperience />
+  <MasonGrid 
+ sectionTitle="Selected Work"
+  subtitle="From Vision to Version"
+  categories={categories}
+  images={images}
+  <!-- viewAllText="View All Works" -->
+  <!-- viewAllHref="/projects" -->
+  />
+      <script src="./BlockDescription.barba.ts"></script>
 </Section>
 
