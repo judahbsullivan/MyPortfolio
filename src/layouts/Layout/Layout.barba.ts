@@ -3,7 +3,7 @@ import { gsap } from "gsap";
 
 function LayoutEnter(container: HTMLElement): void {
   const overlay = document.querySelector<HTMLElement>(".overlay");
-  const footer = document.querySelector<HTMLElement>("footer");
+  // const footer = document.querySelector<HTMLElement>("footer");
 
   if (!overlay) {
     console.error("Overlay element not found!");
@@ -11,16 +11,16 @@ function LayoutEnter(container: HTMLElement): void {
   }
 
   // Hide footer while overlay is animating out
-  if (footer) {
-    gsap.set(footer, { autoAlpha: 0 });
-  }
-
+  // if (footer) {
+  //   gsap.set(footer, { autoAlpha: 0 });
+  // }
+  //
   const tl = gsap.timeline({
-    onComplete: () => {
-      if (footer) {
-        gsap.to(footer, { autoAlpha: 1, duration: 0.5 });
-      }
-    },
+    //   onComplete: () => {
+    //     if (footer) {
+    //       gsap.to(footer, { autoAlpha: 1, duration: 0.5 });
+    //     }
+    //   },
   });
 
   tl.set(overlay, { transformOrigin: "top" })

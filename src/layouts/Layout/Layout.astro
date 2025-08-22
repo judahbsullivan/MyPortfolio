@@ -33,15 +33,13 @@ const navItems = await getNavigationItems();
 
       <main id="smooth-content" data-barba="container" 
            class={tw(
-        "relative",        /* create a stacking context */
-        "z-20",            /* sit above the footer */
+        "relative ",        /* create a stacking context */
         className
       )}
       >
         <slot />
-
-      </main>
       <Footer user_created={user_created} />
+      </main>
     </div>
     <script src="./Layout.barba.ts"></script>
   </body>
