@@ -36,11 +36,8 @@ bun run preview
 
 ## Environment
 
-The Directus API base URL is currently defined in `src/types/env.ts`:
-
-```ts
-export const apiUrl: string = "https://judahsullivan.directus.app/";
-```
+.env
+.env.example
 
 If you need to point to another Directus instance, update that value or refactor to read from an environment variable.
 
