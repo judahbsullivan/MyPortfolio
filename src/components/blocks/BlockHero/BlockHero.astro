@@ -25,9 +25,14 @@ const buttons: BlockButton[] =
 <Section 
   id="hero-block"
   fullWidth
-  class=" ">
-   <div class="flex w-full px-6 items-center flex-col justify-between h-screen pt-10 pb-6  gap-24">
-        <h1 class="hero-headline tracking-tighter text-7xl md:text-[10vw] inline-block text-pretty break-keep leading-[.99] uppercase text-center">
+  class="relative overflow-hidden">
+   <!-- 3D Rotating Orb Background -->
+   <div class="orb-container absolute inset-0 pointer-events-none">
+     <div class="orb"></div>
+   </div>
+   
+   <div class="flex w-full px-6 items-center flex-col justify-between h-screen pt-10 pb-6 gap-24 relative z-10">
+        <h1 class="hero-headline transition-all tracking-tighter text-7xl md:text-[10vw] inline-block text-pretty break-keep leading-[.99] uppercase tralate-y-[200px] text-center">
           Creative Systems, Scalable Code
         </h1>
 
@@ -48,6 +53,59 @@ const buttons: BlockButton[] =
           </div>
         </div>
       </div>
+
+<style>
+  .orb-container {
+    perspective: 1000px;
+  }
+  
+  .orb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle at 30% 30%, 
+      rgba(200, 200, 200, 0.3) 0%, 
+      rgba(180, 180, 180, 0.2) 40%, 
+      rgba(160, 160, 160, 0.1) 70%, 
+      rgba(140, 140, 140, 0.05) 100%);
+    border-radius: 50%;
+    box-shadow: 
+      inset 0 0 50px rgba(255, 255, 255, 0.1),
+      0 0 100px rgba(200, 200, 200, 0.1),
+      0 0 200px rgba(180, 180, 180, 0.05);
+    animation: rotateOrb 20s linear infinite;
+    filter: blur(1px);
+  }
+  
+  @keyframes rotateOrb {
+    0% {
+      transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+    }
+  }
+  
+  /* Ensure text remains readable */
+  .hero-headline,
+  h2, h4, p {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 2;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .orb {
+      width: 300px;
+      height: 300px;
+    }
+  }
+</style>
+
   <script src="./BlockHero.barba.ts"></script>
 </Section>
 

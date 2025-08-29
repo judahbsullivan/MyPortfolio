@@ -26,15 +26,22 @@ export default function registerBlockHeroHooks() {
         mask: "lines",
       });
 
+      // Set initial position - hide the text completely
+      tl.set(hsplit.chars, {
+        yPercent: 200,
+        opacity: 0,
+      });
+
       const pSplit = new SplitText(paragraph, {
         type: "lines, words",
         mask: "lines",
         linesClass: "line-parent",
       });
 
-      // Animate heading characters
-      tl.from(hsplit.chars, {
-        yPercent: 200,
+      // Animate heading characters from hidden position
+      tl.to(hsplit.chars, {
+        yPercent: 0,
+        opacity: 1,
         duration: 0.78,
         stagger: 0.03,
         ease: "power4.out",

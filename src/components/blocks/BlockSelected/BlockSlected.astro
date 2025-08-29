@@ -1,0 +1,31 @@
+---
+import Section from '@/components/ui/Section.astro'
+import MasonGrid from '@/components/ui/MasonGrid.astro'
+
+const images = [
+    {
+        id: 1,
+        imageUrl: 'https://via.placeholder.com/150',
+        title: 'Image 1',
+    }
+]
+const categories = ['Design', 'Development', 'Branding', 'Illustration', 'Photography']
+---
+
+
+<Section>
+
+    
+<MasonGrid 
+sectionTitle="Selected Work"
+categories={categories}
+subtitle="From Vision to Version"
+viewAllText="View All Works"
+viewAllHref="/projects"     
+images={images}
+/>
+
+
+    <script src="./BlockSelected.barba.ts"></script>
+</Section>   
+

@@ -1,6 +1,6 @@
 ---
 import MasonGrid from '@/components/ui/MasonGrid.astro'
-import BlockExperience from '@/components/blocks/BlockList/BlockList.astro'
+import BlockExperience from '@/components/blocks/BlockExperience/BlockList.astro'
 import Button from "@/components/ui/Button.astro";
 import Section from "@/layouts/Section.astro";
 import type { BlockButton, BlockDescription } from "@/types/directusCollection";
@@ -66,8 +66,6 @@ const categories = ["Architecture", "Nature", "Workspace", "Abstract", "Fashion"
   subtitle="From Vision to Version"
   categories={categories}
   images={images}
-  <!-- viewAllText="View All Works" -->
-  <!-- viewAllHref="/projects" -->
   />
       <script src="./BlockDescription.barba.ts"></script>
 </Section>
