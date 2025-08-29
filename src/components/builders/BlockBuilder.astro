@@ -17,6 +17,7 @@ const blockMap: Record<string, () => Promise<{ default: any }>> = {
   block_form: () => import('../blocks/BlockForm/BlockForm.astro'),
   block_richtext: () => import('../blocks/BlockRichText/BlockRichText.astro'),
   block_gallery: () => import('../blocks/BlockGallery/BlockGallery.astro'),
+  block_experience: () => import('../blocks/BlockExperience/BlockList.astro'),
   // block_pricing: () => import('../blocks/BlockPricing/BlockPricing.astro'),
   block_description: () => import('../blocks/BlockDescription/BlockDescription.astro'),
   block_posts: () => import('../blocks/BlockPosts/BlockPosts.astro'),

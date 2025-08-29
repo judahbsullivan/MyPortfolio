@@ -1,0 +1,255 @@
+---
+// ScrollOrb component for home page only
+---
+
+<div id="scroll-orb" class="scroll-orb-container">
+  <div class="scroll-orb"></div>
+</div>
+
+<style>
+  .scroll-orb-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 50;
+  }
+  
+  .scroll-orb {
+    position: absolute;
+    width: 24rem;
+    height: 24rem;
+    border-radius: 50%;
+    filter: blur(4px);
+    background: radial-gradient(circle at 30% 30%, 
+      rgba(200, 200, 200, 0.4) 0%, 
+      rgba(180, 180, 180, 0.3) 40%, 
+      rgba(160, 160, 160, 0.2) 70%, 
+      rgba(140, 140, 140, 0.1) 100%);
+    box-shadow: 
+      inset 0 0 50px rgba(255, 255, 255, 0.15),
+      0 0 100px rgba(200, 200, 200, 0.15),
+      0 0 200px rgba(180, 180, 180, 0.1);
+    animation: rotateOrb 20s linear infinite;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease-out;
+  }
+  
+  @keyframes rotateOrb {
+    0% {
+      transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+    }
+  }
+  
+  /* Section-specific effects */
+  .orb-hero {
+    background: radial-gradient(circle at 30% 30%, 
+      rgba(200, 200, 200, 0.5) 0%, 
+      rgba(180, 180, 180, 0.4) 40%, 
+      rgba(160, 160, 160, 0.3) 70%, 
+      rgba(140, 140, 140, 0.2) 100%);
+    box-shadow: 
+      inset 0 0 60px rgba(255, 255, 255, 0.2),
+      0 0 120px rgba(200, 200, 200, 0.2),
+      0 0 240px rgba(180, 180, 180, 0.15);
+  }
+  
+  .orb-projects {
+    background: radial-gradient(circle at 30% 30%, 
+      rgba(100, 150, 200, 0.4) 0%, 
+      rgba(80, 130, 180, 0.3) 40%, 
+      rgba(60, 110, 160, 0.2) 70%, 
+      rgba(40, 90, 140, 0.1) 100%);
+    box-shadow: 
+      inset 0 0 50px rgba(100, 150, 200, 0.2),
+      0 0 100px rgba(100, 150, 200, 0.15),
+      0 0 200px rgba(80, 130, 180, 0.1);
+  }
+  
+  .orb-about {
+    background: radial-gradient(circle at 30% 30%, 
+      rgba(200, 180, 150, 0.4) 0%, 
+      rgba(180, 160, 130, 0.3) 40%, 
+      rgba(160, 140, 110, 0.2) 70%, 
+      rgba(140, 120, 90, 0.1) 100%);
+    box-shadow: 
+      inset 0 0 50px rgba(200, 180, 150, 0.2),
+      0 0 100px rgba(200, 180, 150, 0.15),
+      0 0 200px rgba(180, 160, 130, 0.1);
+  }
+  
+  .orb-footer {
+    background: radial-gradient(circle at 30% 30%, 
+      rgba(150, 150, 150, 0.3) 0%, 
+      rgba(130, 130, 130, 0.2) 40%, 
+      rgba(110, 110, 110, 0.1) 70%, 
+      rgba(90, 90, 90, 0.05) 100%);
+    box-shadow: 
+      inset 0 0 40px rgba(150, 150, 150, 0.1),
+      0 0 80px rgba(150, 150, 150, 0.1),
+      0 0 160px rgba(130, 130, 130, 0.05);
+    animation: rotateOrb 30s linear infinite;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .scroll-orb {
+      width: 18rem;
+      height: 18rem;
+    }
+  }
+</style>
+
+<script>
+  class ScrollOrbController {
+    constructor() {
+      this.orb = document.querySelector('.scroll-orb');
+      this.container = document.querySelector('.scroll-orb-container');
+      this.isHomePage = window.location.pathname === '/' || window.location.pathname === '';
+      
+      if (!this.orb || !this.isHomePage) {
+        this.destroy();
+        return;
+      }
+      
+      this.init();
+    }
+    
+    init() {
+      this.setupScrollListener();
+      this.setupResizeListener();
+      this.updateOrbPosition();
+    }
+    
+    setupScrollListener() {
+      let ticking = false;
+      
+      const updateOrb = () => {
+        this.updateOrbPosition();
+        ticking = false;
+      };
+      
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          requestAnimationFrame(updateOrb);
+          ticking = true;
+        }
+      });
+    }
+    
+    setupResizeListener() {
+      window.addEventListener('resize', () => {
+        this.updateOrbPosition();
+      });
+    }
+    
+    updateOrbPosition() {
+      if (!this.orb) return;
+      
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollProgress = scrollY / (documentHeight - windowHeight);
+      
+      // Get all sections/blocks
+      const sections = document.querySelectorAll('section, [id*="block"], footer');
+      const currentSection = this.getCurrentSection(sections, scrollY);
+      
+      if (currentSection) {
+        this.updateOrbForSection(currentSection, scrollProgress, scrollY);
+      }
+    }
+    
+    getCurrentSection(sections, scrollY) {
+      let currentSection = null;
+      
+      sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        const sectionTop = rect.top + scrollY;
+        const sectionBottom = sectionTop + rect.height;
+        
+        if (scrollY >= sectionTop - window.innerHeight / 2 && scrollY < sectionBottom) {
+          currentSection = section;
+        }
+      });
+      
+      return currentSection;
+    }
+    
+    updateOrbForSection(section, scrollProgress, scrollY) {
+      const rect = section.getBoundingClientRect();
+      const sectionTop = rect.top + scrollY;
+      const sectionHeight = rect.height;
+      const sectionProgress = (scrollY - sectionTop) / sectionHeight;
+      
+      // Base position calculation
+      let left = 50; // percentage
+      let top = 50; // percentage
+      let scale = 1;
+      let opacity = 0.6;
+      
+      // Hero section (first section)
+      if (section.id === 'hero-block' || section.classList.contains('hero-section')) {
+        left = 50 + Math.sin(scrollProgress * Math.PI) * 20;
+        top = 50 - sectionProgress * 30;
+        scale = 1.2 - sectionProgress * 0.2;
+        opacity = 0.8 - sectionProgress * 0.2;
+      }
+      // Footer section
+      else if (section.tagName === 'FOOTER') {
+        left = 50;
+        top = 80; // Position in footer
+        scale = 0.8;
+        opacity = 0.4;
+      }
+      // Other sections
+      else {
+        left = 50 + Math.sin(scrollProgress * Math.PI * 2) * 15;
+        top = 30 + Math.sin(scrollProgress * Math.PI) * 20;
+        scale = 0.9 + Math.sin(scrollProgress * Math.PI) * 0.1;
+        opacity = 0.5 + Math.sin(scrollProgress * Math.PI) * 0.2;
+      }
+      
+      // Apply transformations
+      this.orb.style.left = `${left}%`;
+      this.orb.style.top = `${top}%`;
+      this.orb.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      this.orb.style.opacity = opacity.toString();
+      
+      // Add section-specific effects
+      this.addSectionEffects(section, sectionProgress);
+    }
+    
+    addSectionEffects(section, sectionProgress) {
+      // Remove previous effect classes
+      this.orb.classList.remove('orb-hero', 'orb-projects', 'orb-about', 'orb-contact', 'orb-footer');
+      
+      // Add section-specific classes
+      if (section.id === 'hero-block') {
+        this.orb.classList.add('orb-hero');
+      } else if (section.id?.includes('project')) {
+        this.orb.classList.add('orb-projects');
+      } else if (section.id?.includes('about') || section.id?.includes('description')) {
+        this.orb.classList.add('orb-about');
+      } else if (section.tagName === 'FOOTER') {
+        this.orb.classList.add('orb-footer');
+      }
+    }
+    
+    destroy() {
+      if (this.container) {
+        this.container.remove();
+      }
+    }
+  }
+  
+  // Initialize the scroll orb controller
+  document.addEventListener('DOMContentLoaded', () => {
+    new ScrollOrbController();
+  });
+</script>
