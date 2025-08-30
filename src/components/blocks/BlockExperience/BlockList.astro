@@ -35,9 +35,9 @@ const { tagline, headline, description, jobs: list } = Astro.props;
         <span class="text-lg desc-title text-neutral-500">
           {job.location} | {job.date}
         </span>
-        <ul  class="desc-text list-disc pl-6 space-y-2">
-          {job.bullets.map((point) => (
-            <li>{point}</li>
+        <ul class="desc-text list-disc pl-6 space-y-2">
+          {job.bullets.map((point: string, idx: number) => (
+            <li >{point}</li>
           ))}
         </ul>
       </div>

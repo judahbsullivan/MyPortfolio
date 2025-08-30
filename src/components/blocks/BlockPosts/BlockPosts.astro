@@ -1,65 +1,114 @@
 ---
 import type { BlockPosts, Posts } from '@/types/directusCollection';
 import { getItems } from '@/directus/queries/utils';
-import DirectusImage from '@/components/ui/DirectusImage.astro';
 import Section from '@/layouts/Section.astro';
-import Button from '@/components/ui/Button.astro';
-import Link from '@/components/ui/Link.astro';
+import MasonGrid from '@/components/ui/MasonGrid.astro';
+import Table from '@/components/ui/Table.astro';
 
 const props = Astro.props as BlockPosts;
 const { headline, tagline, limit, collection } = props;
 
-// Fetch posts from the specified collection
-const posts = await getItems<Posts>(collection as string, Number(limit));
+// Resolve safe defaults
+const resolvedCollection = typeof collection === 'string' && collection.trim() ? collection : 'posts';
+const resolvedLimit = typeof limit === 'number' && Number.isFinite(limit) && limit > 0 ? limit : undefined;
+
+// Fetch posts from the specified collection with guards so SSR can't break the page
+let posts: Posts[] = [];
+try {
+  posts = await getItems<Posts>(resolvedCollection, resolvedLimit as any);
+} catch (err) {
+  console.error('Failed to load posts for BlockPosts:', err);
+  posts = [];
+}
+
+// For now, let's create some mock categories since Posts doesn't have tags
+// In a real implementation, you'd need to add a tags field to your Posts collection
+const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
+
+console.log(posts);
 ---
 
-<Section fullWidth class="block-posts py-24 px-4 md:px-16 space-y-16">
-  <!-- Headline -->
-  <div class="space-y-4">
-    {tagline && (
-      <p class="text-sm text-gray-500 uppercase tracking-widest">{tagline}</p>
-    )}
-    {headline && (
-      <h2 class="text-5xl md:text-5xl lg:text-6xl xl:text-8xl leading-tight tracking-tight text-gray-900">
-        {headline}
-      </h2>
-    )}
+<Section id="posts-block" fullWidth class="relative overflow-hidden">
+  <!-- Hero Section -->
+  <div class="flex w-full px-6 items-center flex-col justify-between pt-10 pb-6 gap-24 relative z-10">
+    <h1 class="posts-headline transition-all tracking-tighter text-7xl md:text-[10vw] inline-block text-pretty break-keep leading-[.99] uppercase text-center">
+      {headline || "Latest Posts"}
+    </h1>
+<!-- 
+    <div class="flex gap-2 items-end w-full flex-col">
+      <div class="md:w-1/2">
+        <h2 class="text-lg uppercase tracking-wider text-neutral-500 mb-1">
+          {tagline || "Discover our latest articles and insights"}
+        </h2>
+        <h4 class="text-4xl md:text-[5vw] uppercase font-light leading-tight tracking-tighter">
+          Knowledge & Insights
+        </h4>
+        <p class="text-lg text-gray-600 mt-4">
+          Explore our curated collection of articles, tutorials, and thoughts
+        </p>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- Controls Section -->
+  <div class="px-6 py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto">
+      <!-- Category Filters -->
+      <div class="mb-8">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Filter by Category</h3>
+        <div class="flex flex-wrap gap-3">
+          <button 
+            class="category-btn active px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+            data-category="all"
+          >
+            All Posts
+          </button>
+          {mockCategories.map((category) => (
+            <button 
+              class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+              data-category={category}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- Layout Toggle -->
+      <div class="flex justify-between items-center mb-8">
+        <div class="text-sm text-gray-600">
+          <span id="post-count">{posts?.length || 0}</span> posts found
+        </div>
+        <div class="hidden md:flex items-center gap-2 bg-gray-200 rounded-lg p-1">
+          <button 
+            class="layout-btn active px-3 py-2 bg-white text-gray-900 rounded-md text-sm font-medium shadow-sm transition-all"
+            data-layout="mason"
+          >
+            Grid
+          </button>
+          <button 
+            class="layout-btn px-3 py-2 text-gray-600 rounded-md text-sm font-medium hover:text-gray-900 transition-colors"
+            data-layout="table"
+          >
+            Table
+          </button>
+        </div>
+      </div>
+
+      <!-- Posts Container -->
+      <div id="posts-container" class="posts-mason">
+        <MasonGrid posts={posts || []} />
+      </div>
+      
+      <div id="posts-table" class="posts-table hidden md:hidden">
+        <Table posts={posts || []} />
+      </div>
+      {(!posts || posts.length === 0) && (
+        <div class="mt-8 text-center text-gray-500">No posts found.</div>
+      )}
+    </div>
   </div>
-<!-- <hr /> -->
-  <!---->
-  <!-- <!-- Filters & View Mode Buttons -->
-  <!-- <div class="flex justify-between items-center mt-4 mb-6"> -->
-  <!--   <div class="flex flex-wrap gap-4"> -->
-  <!--     <Button size="sm">All</Button> -->
-  <!--     <Button size="sm">Design</Button> -->
-  <!--     <Button size="sm">Development</Button> -->
-  <!--   </div> -->
-  <!--   <div class="flex items-center gap-4 shrink-0"> -->
-  <!--     <Button size="sm">List</Button> -->
-  <!--     <Button size="sm">Card</Button> -->
-  <!--   </div> -->
-  <!-- </div> -->
-  <!---->
-  <!-- Table/List View Posts -->
-  <div class="mt-24 divide-y border-t w-full">
-    {posts?.slice(0, Number(limit)).map((post) => (
-      <Link
-        id={post.id}
-        href={`/post/${post.slug}`}
-        class="flex py-12 w-full justify-between"
-      >
-      <h3 class="text-lg w-1/3 md:text-xl font-medium text-black">{post.title}</h3>
-      <p class="text-sm w-1/3 text-gray-600 translate-2">{post.description}</p>
-        <div class="text-sm text-gray-500">Read More →</div>
-        <div></div> 
-      </Link>
-    ))}
-  </div>
-  <!---->
-  <!-- <div class="flex justify-center pt-8"> -->
-  <!--     <Button> -->
-  <!--       View more {collection} -->
-  <!--     </Button> -->
-  <!-- </div> -->
+
+  <script src="./BlockPosts.barba.ts"></script>
 </Section>
 

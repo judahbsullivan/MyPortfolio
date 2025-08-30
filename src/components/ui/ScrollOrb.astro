@@ -1,8 +1,7 @@
 ---
-// ScrollOrb component for home page only
 ---
 
-<div id="scroll-orb" class="scroll-orb-container">
+<div id="scroll-orb" class="scroll-orb-container" style="display: none;">
   <div class="scroll-orb"></div>
 </div>
 
@@ -14,7 +13,7 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 50;
+    z-index: 10;
   }
   
   .scroll-orb {
@@ -110,17 +109,103 @@
     constructor() {
       this.orb = document.querySelector('.scroll-orb');
       this.container = document.querySelector('.scroll-orb-container');
-      this.isHomePage = window.location.pathname === '/' || window.location.pathname === '';
+      this.isInitialized = false;
+      this.initTimeout = null;
       
-      if (!this.orb || !this.isHomePage) {
-        this.destroy();
+      if (!this.orb || !this.container) {
+        console.log('ScrollOrb: Elements not found');
         return;
       }
       
-      this.init();
+      console.log('ScrollOrb: Controller initialized');
+      this.waitForPageReady();
+    }
+    
+    waitForPageReady() {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          this.delayedInit();
+        });
+      } else {
+        this.delayedInit();
+      }
+    }
+    
+    delayedInit() {
+      if (this.initTimeout) {
+        clearTimeout(this.initTimeout);
+      }
+      
+      this.initTimeout = setTimeout(() => {
+        console.log('ScrollOrb: Delayed init triggered');
+        this.checkHomePage();
+        this.setupRouteListener();
+      }, 1000); // Reduced to 1 second
+    }
+    
+    checkHomePage() {
+      const isHomePage = window.location.pathname === '/' || window.location.pathname === '';
+      console.log('ScrollOrb: Checking home page, isHomePage:', isHomePage);
+      
+      if (isHomePage && !this.isInitialized) {
+        console.log('ScrollOrb: Home page detected, waiting for animations');
+        this.waitForHomePageAnimations();
+      } else if (!isHomePage && this.isInitialized) {
+        console.log('ScrollOrb: Leaving home page, destroying');
+        this.destroy();
+      }
+    }
+    
+    waitForHomePageAnimations() {
+      // Much shorter timing: overlay (1.2s) + hero delay (1s) + hero animation (~0.5s)
+      const totalAnimationTime = 1200 + 1000 + 500; // 2.7 seconds total
+      
+      console.log('ScrollOrb: Waiting', totalAnimationTime, 'ms for animations');
+      
+      setTimeout(() => {
+        console.log('ScrollOrb: Animation wait complete, initializing');
+        this.init();
+      }, totalAnimationTime);
+    }
+    
+    setupRouteListener() {
+      window.addEventListener('popstate', () => {
+        console.log('ScrollOrb: Popstate detected');
+        this.delayedInit();
+      });
+      
+      if (window.barba) {
+        window.barba.hooks.afterEnter(() => {
+          console.log('ScrollOrb: Barba afterEnter detected');
+          this.delayedInit();
+        });
+        
+        window.barba.hooks.beforeEnter(() => {
+          console.log('ScrollOrb: Barba beforeEnter detected');
+          this.destroy();
+        });
+      }
+      
+      setInterval(() => {
+        this.checkHomePage();
+      }, 3000);
     }
     
     init() {
+      console.log('ScrollOrb: Initializing orb');
+      this.isInitialized = true;
+      
+      this.container.style.display = 'block';
+      this.container.style.opacity = '0';
+      this.container.style.transform = 'scale(0.8)';
+      
+      setTimeout(() => {
+        this.container.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+        this.container.style.opacity = '1';
+        this.container.style.transform = 'scale(1)';
+        console.log('ScrollOrb: Orb should now be visible');
+      }, 100);
+      
       this.setupScrollListener();
       this.setupResizeListener();
       this.updateOrbPosition();
@@ -149,19 +234,23 @@
     }
     
     updateOrbPosition() {
-      if (!this.orb) return;
+      if (!this.orb || !this.isInitialized) return;
       
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       const scrollProgress = scrollY / (documentHeight - windowHeight);
       
-      // Get all sections/blocks
       const sections = document.querySelectorAll('section, [id*="block"], footer');
       const currentSection = this.getCurrentSection(sections, scrollY);
       
       if (currentSection) {
         this.updateOrbForSection(currentSection, scrollProgress, scrollY);
+      } else {
+        this.orb.style.left = '50%';
+        this.orb.style.top = '50%';
+        this.orb.style.transform = 'translate(-50%, -50%) scale(1)';
+        this.orb.style.opacity = '0.6';
       }
     }
     
@@ -173,7 +262,7 @@
         const sectionTop = rect.top + scrollY;
         const sectionBottom = sectionTop + rect.height;
         
-        if (scrollY >= sectionTop - window.innerHeight / 2 && scrollY < sectionBottom) {
+        if (scrollY >= sectionTop - window.innerHeight / 3 && scrollY < sectionBottom) {
           currentSection = section;
         }
       });
@@ -185,29 +274,25 @@
       const rect = section.getBoundingClientRect();
       const sectionTop = rect.top + scrollY;
       const sectionHeight = rect.height;
-      const sectionProgress = (scrollY - sectionTop) / sectionHeight;
+      const sectionProgress = Math.max(0, Math.min(1, (scrollY - sectionTop) / sectionHeight));
       
-      // Base position calculation
-      let left = 50; // percentage
-      let top = 50; // percentage
+      let left = 50;
+      let top = 50;
       let scale = 1;
       let opacity = 0.6;
       
-      // Hero section (first section)
       if (section.id === 'hero-block' || section.classList.contains('hero-section')) {
         left = 50 + Math.sin(scrollProgress * Math.PI) * 20;
-        top = 50 - sectionProgress * 30;
+        top = 50 - sectionProgress * 20;
         scale = 1.2 - sectionProgress * 0.2;
         opacity = 0.8 - sectionProgress * 0.2;
       }
-      // Footer section
       else if (section.tagName === 'FOOTER') {
         left = 50;
-        top = 80; // Position in footer
+        top = 80;
         scale = 0.8;
         opacity = 0.4;
       }
-      // Other sections
       else {
         left = 50 + Math.sin(scrollProgress * Math.PI * 2) * 15;
         top = 30 + Math.sin(scrollProgress * Math.PI) * 20;
@@ -215,21 +300,17 @@
         opacity = 0.5 + Math.sin(scrollProgress * Math.PI) * 0.2;
       }
       
-      // Apply transformations
       this.orb.style.left = `${left}%`;
       this.orb.style.top = `${top}%`;
       this.orb.style.transform = `translate(-50%, -50%) scale(${scale})`;
       this.orb.style.opacity = opacity.toString();
       
-      // Add section-specific effects
       this.addSectionEffects(section, sectionProgress);
     }
     
     addSectionEffects(section, sectionProgress) {
-      // Remove previous effect classes
       this.orb.classList.remove('orb-hero', 'orb-projects', 'orb-about', 'orb-contact', 'orb-footer');
       
-      // Add section-specific classes
       if (section.id === 'hero-block') {
         this.orb.classList.add('orb-hero');
       } else if (section.id?.includes('project')) {
@@ -242,14 +323,25 @@
     }
     
     destroy() {
+      console.log('ScrollOrb: Destroying orb');
+      this.isInitialized = false;
+      
       if (this.container) {
-        this.container.remove();
+        this.container.style.transition = 'opacity 0.15s ease-out, transform 0.1.5s ease-out';
+        this.container.style.opacity = '0';
+        this.container.style.transform = 'scale(1)';
+        
+        setTimeout(() => {
+          this.container.style.display = 'none';
+        }, 300);
+      }
+      
+      if (this.initTimeout) {
+        clearTimeout(this.initTimeout);
+        this.initTimeout = null;
       }
     }
   }
   
-  // Initialize the scroll orb controller
-  document.addEventListener('DOMContentLoaded', () => {
-    new ScrollOrbController();
-  });
+  new ScrollOrbController();
 </script>

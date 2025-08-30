@@ -7,19 +7,27 @@ import directusClient from "../cli";
  * @param collection - The Directus collection name (e.g., "posts")
  * @param limit - Number of items to return
  */
-export async function getItems<T>(collection: string, limit: number): Promise<T[]> {
-
+export async function getItems<T>(collection: string, limit?: number): Promise<T[]> {
   const sortField = collection === 'projects'
     ? 'published_At'
     : 'date_created';
+
+  const parsedLimit = typeof limit === 'number' && isFinite(limit) ? Math.max(0, Math.floor(limit)) : undefined;
+
+  const requestOptions: any = {
+    sort: [`-${sortField}`],
+    filter: {
+      // status: { _eq: "published" }
+    }
+  };
+
+  // Only include limit if it's a positive integer; otherwise fetch all
+  if (parsedLimit && parsedLimit > 0) {
+    requestOptions.limit = parsedLimit;
+  }
+
   const items = await directusClient.request(
-    readItems(collection as any, {
-      limit,
-      sort: [`-${sortField}`], // sort newest first, optional
-      filter: {
-        // status: { _eq: "published" } // optional: skip if no status field
-      }
-    })
+    readItems(collection as any, requestOptions)
   );
 
   return items as T[];

@@ -5,9 +5,10 @@ import ItemCard from '@/components/ui/ItemCard.astro';
 import { getItems } from '@/directus/queries/utils';
 import Section from '@/layouts/Section.astro';
 import Button from '@/components/ui/Button.astro';
+import DirectusImage from '@/components/ui/DirectusImage.astro';
 
 const { headline, tagline, limit, collection } = Astro.props as BlockProjects;
-const projects = await getItems<Projects>(collection, limit);
+const projects = await getItems<Projects>(collection as string, limit as any);
 ---
 
 <Section fullWidth class="block-projects py-24 px-4 md:px-16 space-y-16">
@@ -38,24 +39,39 @@ const projects = await getItems<Projects>(collection, limit);
       <Button size="sm" className="inline-block scale-0 transition-transform">Design</Button>
       <Button size="sm" className="inline-block scale-0 transition-transform">Development</Button>
     </div>
-    <div class="flex items-center gap-4 shrink-0">
+    <div class="hidden md:flex items-center gap-4 shrink-0">
       <Button size="sm" className="inline-block scale-0 transition-transform">List</Button>
       <Button size="sm" className="inline-block scale-0 transition-transform">Card</Button>
     </div>
   </div>
 
-  <!-- List View -->
-  <div class="mt-24 divide-y border-t w-full space-y-4">
-    {projects.slice(0, Number(limit)).map(post => (
+  <!-- List View with shared hover preview (desktop only) -->
+  <div id="projects-list" class="hidden md:block mt-24 divide-y border-t w-full relative">
+    {projects.slice(0, Number(limit)).map((proj, idx) => (
       <div class="overflow-hidden">
-        <div class="inline-block translate-y-full transition-transform">
-          <ItemList props={post} />
+        <div class="project-row inline-block w-full translate-y-full transition-transform py-5" data-index={idx}>
+          <ItemList props={proj} />
         </div>
       </div>
     ))}
+
+    <!-- Shared hover preview container -->
+    <div id="project-preview" class="pointer-events-none absolute origin-top-left scale-0 opacity-0 transition-all duration-300 ease-out" style="left: 100%; top: 50%;">
+      <div id="project-preview-frame" class="h-36 w-56 overflow-hidden rounded-lg shadow-xl ring-1 ring-black/5 bg-white">
+        <div id="project-preview-slider" data-count={projects.length} class="relative transition-transform duration-500 ease-out flex flex-col-reverse">
+          {projects.map((p) => (
+            <div class="h-36 w-56">
+              {p.cover_image && (
+                <DirectusImage image={p.cover_image} alt={p.title || 'Preview image'} class="h-full w-full object-cover" />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Card View -->
+  <!-- Card View (always on mobile) -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
     {projects.slice(0, Number(limit)).map(project => (
       <div class="overflow-hidden">
@@ -76,5 +92,60 @@ const projects = await getItems<Projects>(collection, limit);
   </div>
 
   <script src="./BlockProjects.barba.ts"></script>
+  <script>
+    const listWrap = document.getElementById('projects-list');
+    const preview = document.getElementById('project-preview');
+    const slider = document.getElementById('project-preview-slider');
+    const frame = document.getElementById('project-preview-frame');
+
+    if (listWrap && preview && slider && frame) {
+      const rows = listWrap.querySelectorAll('.project-row');
+      let activeIndex = 0;
+
+      const showPreview = () => {
+        preview.classList.remove('scale-0', 'opacity-0');
+        preview.classList.add('scale-100', 'opacity-100');
+      };
+      const hidePreview = () => {
+        preview.classList.add('scale-0', 'opacity-0');
+        preview.classList.remove('scale-100', 'opacity-100');
+      };
+      const updateIndex = (index: number) => {
+        const h = frame.clientHeight;
+        const countAttr = slider.getAttribute('data-count');
+        const count = Number(countAttr) || 0;
+        const reversedIndex = Math.max(0, count - 1 - index);
+        const offset = -(reversedIndex * h);
+        (slider as HTMLElement).style.transform = `translateY(${offset}px)`;
+      };
+
+      rows.forEach((row) => {
+        row.addEventListener('mouseenter', (e) => {
+          const target = e.currentTarget as HTMLElement | null;
+          if (!target) return;
+          const indexAttr = target.getAttribute('data-index');
+          const idx = Number(indexAttr) || 0;
+          activeIndex = idx;
+          updateIndex(activeIndex);
+          showPreview();
+        });
+      });
+
+      listWrap.addEventListener('mouseenter', () => {
+        updateIndex(activeIndex);
+        showPreview();
+      });
+      listWrap.addEventListener('mouseleave', () => hidePreview());
+      listWrap.addEventListener('mousemove', (e) => {
+        const rect = listWrap.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const offsetX = 24;
+        const offsetY = -20;
+        (preview as HTMLElement).style.left = `${x + offsetX}px`;
+        (preview as HTMLElement).style.top = `${y + offsetY}px`;
+      });
+    }
+  </script>
 </Section>
 

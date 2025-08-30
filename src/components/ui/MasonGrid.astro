@@ -1,92 +1,62 @@
 ---
-import DirectusImage from '@/components/ui/DirectusImage.astro'
-
-type PinterestImage = {
-  id: string;
-  imageUrl: string;
-  title: string;
-  width: number;
-  height: number;
-  slug?: string;
-  tags: string[];
-};
+import DirectusImage from '@/components/ui/DirectusImage.astro';
+import Link from '@/components/ui/Link.astro';
+import type { Posts } from '@/types/directusCollection';
 
 interface Props {
-  sectionTitle?: string;
-  subtitle?: string;
-  categories?: string[];
-  images?: PinterestImage[];
-  viewAllText?: string;
-  viewAllHref?: string;
+  posts: Posts[];
+  class?: string;
 }
 
-const {
-  sectionTitle,
-  subtitle,
-  categories,
-  images,
-  viewAllText,
-  viewAllHref,
-} = Astro.props;
+const { posts, class: className } = Astro.props;
+
+function getSummary(post: Posts): string {
+  const raw = (post.description || post.content || '') as string;
+  if (!raw) return '';
+  // Strip HTML tags if content is rich text
+  const text = raw.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  return text;
+}
 ---
 
-<section class="min-h-screen px-4 sm:px-8 py-24 w-full flex flex-col items-center gap-24">
-  <header class="w-full">
-    <h2 class="text-xl relative desc-title uppercase tracking-wider text-neutral-500 mb-1">
-      {sectionTitle}
-      {images && 
-      ( 
-
-      <span class="absolute text-xs">({images?.length})</span>
-      )
-
-      }
-    </h2>
-    <h4 class="text-5xl md:text-[5vw] desc-title uppercase font-light leading-tight tracking-tighter">
-      {subtitle}
-    </h4>
-    <!-- <div class="flex gap-6 flex-wrap mt-5"> -->
-    <!--   {categories.map((cat) => ( -->
-    <!--     <button class="px-4 py-2 bg-neutral-200 rounded-xl uppercase tracking-wide text-sm hover:bg-neutral-300 transition"> -->
-    <!--       {cat} -->
-    <!--     </button> -->
-    <!--   ))} -->
-    <!-- </div> -->
-  </header>
-
-  <!-- Masonry Layout -->
-  <div class="columns-1 md:columns-2 lg:columns-3 gap-10 space-y-10 w-full">
-    { 
-    images &&
-    images.map((item) => (
-      <div
-        key={item.id}
-        class="break-inside-avoid desc-btn rounded-2xl overflow-hidden bg-white transition-transform hover:scale-[1.015] hover:shadow-xl"
-      >
-      <a 
-      href={item.slug}
-        >
-        <DirectusImage
-          imageId={item.imageUrl}
-          alt={item.title}
-          class="w-full h-auto object-cover"
-          style={{ aspectRatio: `${item.width} / ${item.height}` }}
-        />
-        <div class=" p-6 flex flex-col gap-2">
-
-          <h3 class="text-xl font-semibold tracking-tight">{item.title}</h3>
-          <div class="text-sm text-neutral-500 uppercase tracking-wider flex flex-wrap gap-2">
-            {item.tags.map((tag) => (
-              <span>#{tag}</span>
-            ))}
+<div class={`mason-grid w-full ${className || ''}`}>
+  <div class="columns-1 md:columns-2 lg:columns-3" style="column-gap: 1.5rem;">
+    {posts.map((post) => (
+      <div class="mb-6 break-inside-avoid rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+        <Link href={`/post/${post.slug}`}>
+          {post.image && (
+            <DirectusImage
+              imageId={post.image}
+              alt={post.title || 'Post image'}
+              class="w-full h-auto block object-cover hover:scale-[1.01] transition-transform duration-300"
+            />
+          )}
+          <div class="p-6">
+            <h3 class="text-xl font-semibold tracking-tight text-gray-900 mb-2 hover:text-blue-600 transition-colors">
+              {post.title}
+            </h3>
+            {getSummary(post) && (
+              <p class="text-sm text-gray-600 line-clamp-3 mb-3">
+                {post.description}
+              </p>
+            )}
+            {post.published_at && (
+              <div class="text-xs text-gray-500">
+                {new Date(post.published_at).toLocaleDateString()}
+              </div>
+            )}
           </div>
-        </div>
-</a>
+        </Link>
       </div>
     ))}
   </div>
-  <!---->
-  <!-- <a class="text-2xl" href={viewAllHref}> -->
-  <!--   {viewAllText} -->
-  <!-- </a> -->
-</section>
+</div>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

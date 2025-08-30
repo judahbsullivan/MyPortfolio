@@ -1,0 +1,144 @@
+---
+import Link from '@/components/ui/Link.astro';
+import type { Posts } from '@/types/directusCollection';
+import DirectusImage from '@/components/ui/DirectusImage.astro';
+
+interface Props {
+  posts: Posts[];
+  class?: string;
+}
+
+const { posts, class: className } = Astro.props;
+
+function getSummary(post: Posts): string {
+  const raw = (post.description || post.content || '') as string;
+  if (!raw) return '';
+  const text = raw.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  return text;
+}
+---
+
+<div class={`w-full ${className || ''}`}>
+  <div id="posts-table-wrap" class="relative divide-y divide-gray-200 border-t border-gray-200">
+    {posts.map((post, index) => (
+      <Link
+        href={`/post/${post.slug}`}
+        class="post-row group relative flex items-baseline justify-between gap-6 py-5"
+        data-index={index}
+      >
+        <div class="min-w-0">
+          <h3 class="truncate text-base font-medium tracking-tight text-gray-900 group-hover:text-blue-600 transition-colors">
+            {post.title}
+          </h3>
+          {getSummary(post) && (
+            <p class="mt-1 text-sm text-gray-600 line-clamp-2">
+              {getSummary(post)}
+            </p>
+          )}
+        </div>
+        <div class="flex shrink-0 items-center gap-4 text-sm">
+          {post.published_at && (
+            <span class="text-gray-500">
+              {new Date(post.published_at).toLocaleDateString()}
+            </span>
+          )}
+          <span class="text-gray-400 group-hover:text-gray-800 transition-colors">→</span>
+        </div>
+      </Link>
+    ))}
+
+    <!-- Shared hover preview container -->
+    <div id="post-preview" class="pointer-events-none absolute origin-top-left scale-0 opacity-0 transition-all duration-300 ease-out" style="left: 100%; top: 50%;">
+      <div id="post-preview-frame" class="h-36 w-56 overflow-hidden rounded-lg shadow-xl ring-1 ring-black/5 bg-white">
+        <div id="post-preview-slider" data-count={posts.length} class="relative transition-transform duration-500 ease-out flex flex-col-reverse">
+          {posts.map((post) => (
+            <div class="h-36 w-56">
+              {post.image && (
+                <DirectusImage
+                  imageId={post.image}
+                  alt={post.title || 'Preview image'}
+                  class="h-full w-full object-cover"
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const tableWrap = document.getElementById('posts-table-wrap');
+  const preview = document.getElementById('post-preview');
+  const slider = document.getElementById('post-preview-slider');
+  const frame = document.getElementById('post-preview-frame');
+
+  if (tableWrap && preview && slider && frame) {
+    const rows = tableWrap.querySelectorAll('.post-row');
+    let activeIndex = 0;
+
+    const showPreview = () => {
+      preview.classList.remove('scale-0', 'opacity-0');
+      preview.classList.add('scale-100', 'opacity-100');
+    };
+
+    const hidePreview = () => {
+      preview.classList.add('scale-0', 'opacity-0');
+      preview.classList.remove('scale-100', 'opacity-100');
+    };
+
+    const updateIndex = (index: number) => {
+      const h = frame.clientHeight;
+      const countAttr = slider.getAttribute('data-count');
+      const count = Number(countAttr) || 0;
+      const reversedIndex = Math.max(0, count - 1 - index);
+      const offset = -(reversedIndex * h);
+      slider.style.transform = `translateY(${offset}px)`;
+    };
+
+    rows.forEach((row) => {
+      row.addEventListener('mouseenter', (e) => {
+        const target = e.currentTarget as HTMLElement | null;
+        if (!target) return;
+        const indexAttr = target.getAttribute('data-index');
+        const idx = Number(indexAttr) || 0;
+        activeIndex = idx;
+        updateIndex(activeIndex);
+        showPreview();
+      });
+    });
+
+    tableWrap.addEventListener('mouseenter', () => {
+      updateIndex(activeIndex);
+      showPreview();
+    });
+
+    tableWrap.addEventListener('mouseleave', () => {
+      hidePreview();
+    });
+
+    // Follow mouse position within the table
+    const follow = (e: MouseEvent) => {
+      const rect = tableWrap.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      // Offset a bit to the right of the cursor
+      const offsetX = 24;
+      const offsetY = -20;
+      preview.style.left = `${x + offsetX}px`;
+      preview.style.top = `${y + offsetY}px`;
+    };
+
+    tableWrap.addEventListener('mousemove', follow);
+  }
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
