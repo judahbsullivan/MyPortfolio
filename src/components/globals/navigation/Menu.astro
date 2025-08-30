@@ -103,10 +103,12 @@ navBtn.forEach(btn =>
     isToggle = !isToggle;
     isToggle ? (
       tl.play(),
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden',
+      document.body.classList.add('menu-open')
     ) : (
         tl.reverse(),
-        document.body.style.overflow = 'auto'
+        document.body.style.overflow = 'auto',
+        document.body.classList.remove('menu-open')
       );
   })
 );
@@ -136,6 +138,7 @@ links.forEach(link =>
     if (!tl.reversed()) {
       tl.reverse();
       document.body.style.overflow = 'auto';
+      document.body.classList.remove('menu-open');
       isToggle = false;
     }
   })

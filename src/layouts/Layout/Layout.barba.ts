@@ -76,8 +76,9 @@ export default function registerLayoutBarba() {
 
         async afterEnter({ next }) {
           console.log("[layout.barba] afterEnter → unblocked container");
-
-          window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+          // Always reset scroll to top after transitions (use instant on mobile)
+          const isMobile = window.matchMedia('(max-width: 767px)').matches;
+          window.scrollTo({ top: 0, left: 0, behavior: isMobile ? 'auto' : 'auto' });
           requestAnimationFrame(() => {
             if ((window as any).initSmoother) {
               (window as any).initSmoother();
