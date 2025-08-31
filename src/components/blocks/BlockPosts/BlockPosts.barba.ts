@@ -108,7 +108,7 @@ function initializePostsInteractivity() {
 
   // Get all posts from the current view
   function getAllPosts() {
-    const postElements = document.querySelectorAll('[href*="/post/"]');
+    const postElements = document.querySelectorAll('[href*="/post/"] , [href*="/project/"]');
     return Array.from(postElements).map(element => {
       const link = element as HTMLElement;
       const title = link.querySelector('h3')?.textContent || '';

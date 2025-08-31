@@ -15,10 +15,6 @@ export async function getPages() {
           blocks: ["*.*.*.*",]
         }
       ],
-      filter: {
-        status: { _eq: 'published' }, // optional
-      },
-      sort: ['sort'], // optional
     })
   )
   return pages

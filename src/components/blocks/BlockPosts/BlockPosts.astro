@@ -1,5 +1,5 @@
 ---
-import type { BlockPosts, Posts } from '@/types/directusCollection';
+import type { BlockPosts } from '@/types/directusCollection';
 import { getItems } from '@/directus/queries/utils';
 import Section from '@/layouts/Section.astro';
 import MasonGrid from '@/components/ui/MasonGrid.astro';
@@ -12,20 +12,29 @@ const { headline, tagline, limit, collection } = props;
 const resolvedCollection = typeof collection === 'string' && collection.trim() ? collection : 'posts';
 const resolvedLimit = typeof limit === 'number' && Number.isFinite(limit) && limit > 0 ? limit : undefined;
 
-// Fetch posts from the specified collection with guards so SSR can't break the page
-let posts: Posts[] = [];
+// Fetch items from the specified collection with guards so SSR can't break the page
+type CardItem = { slug?: string | null; title?: string | null; description?: string | null; image?: string | null; published_at?: string | null };
+let items: any[] = [];
 try {
-  posts = await getItems<Posts>(resolvedCollection, resolvedLimit as any);
+  items = await getItems<any>(resolvedCollection, resolvedLimit as any);
 } catch (err) {
-  console.error('Failed to load posts for BlockPosts:', err);
-  posts = [];
+  console.error('Failed to load items for BlockPosts:', err);
+  items = [];
 }
+
+// Normalize to common shape for grid/table
+const base = resolvedCollection === 'projects' ? 'project' : 'post';
+const normalized: CardItem[] = (items || []).map((it: any) => ({
+  slug: it?.slug ?? null,
+  title: it?.title ?? null,
+  description: it?.description ?? null,
+  image: (base === 'project' ? it?.cover_image : it?.image) ?? null,
+  published_at: (base === 'project' ? it?.date_created : it?.published_at) ?? null,
+}));
 
 // For now, let's create some mock categories since Posts doesn't have tags
 // In a real implementation, you'd need to add a tags field to your Posts collection
 const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
-
-console.log(posts);
 ---
 
 <Section id="posts-block" fullWidth class="relative overflow-hidden">
@@ -51,7 +60,7 @@ console.log(posts);
   </div> -->
 
   <!-- Controls Section -->
-  <div class="px-6 py-12">
+  <div class="px-6 py-12 w-full">
     <div class="max-w-7xl mx-auto">
       <!-- Category Filters -->
       <div class="mb-8">
@@ -77,7 +86,7 @@ console.log(posts);
       <!-- Layout Toggle -->
       <div class="flex justify-between items-center mb-8">
         <div class="text-sm text-gray-600">
-          <span id="post-count">{posts?.length || 0}</span> posts found
+          <span id="post-count">{normalized?.length || 0}</span> items found
         </div>
         <div class="hidden md:flex items-center gap-2 bg-gray-200 rounded-lg p-1">
           <button 
@@ -97,13 +106,13 @@ console.log(posts);
 
       <!-- Posts Container -->
       <div id="posts-container" class="posts-mason">
-        <MasonGrid posts={posts || []} />
+        <MasonGrid posts={normalized} base={base} />
       </div>
       
       <div id="posts-table" class="posts-table hidden md:hidden">
-        <Table posts={posts || []} />
+        <Table posts={normalized} base={base} />
       </div>
-      {(!posts || posts.length === 0) && (
+      {(!normalized || normalized.length === 0) && (
         <div class="mt-8 text-center text-gray-500">No posts found.</div>
       )}
     </div>

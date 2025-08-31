@@ -1,6 +1,8 @@
 ---
 import type { BlockButton, BlockHero } from "@/types/directusCollection"
 import Button from "@/components/ui/Button.astro";
+import PillLink from "@/components/ui/PillLink.astro";
+import Headline from '@/components/ui/Headline.astro'
 import Section from "@/layouts/Section.astro";
 import DirectusImage from "@/components/ui/DirectusImage.astro";
 import type { DirectusUser } from "@directus/sdk";
@@ -16,10 +18,10 @@ const {
 }  = Astro.props as BlockHero & { user_created: DirectusUser };
 // 2. Make sure layout is never null/undefined and always one of our keys
 
-const buttons: BlockButton[] =
-  typeof button_group === "object" && Array.isArray(button_group?.buttons)
-    ? (button_group?.buttons as BlockButton[])
-    : [];
+const buttons: BlockButton[] = Array.isArray(button_group && button_group.buttons)
+  ? (button_group!.buttons as BlockButton[])
+  : [];
+console.log(image);
 ---
 
 <Section 
@@ -28,29 +30,37 @@ const buttons: BlockButton[] =
   class="relative overflow-hidden">
    
    <div class="flex w-full px-6 items-center flex-col justify-between h-screen pt-10 pb-6 gap-24 relative z-10">
-        <h1 class="hero-headline transition-all tracking-tighter text-7xl md:text-[10vw] inline-block text-pretty break-keep leading-[.99] uppercase tralate-y-[200px] text-center">
+    <Headline 
+      as="h1"
+       class="hero-headline overflow-hidden transition-transform  tracking-tighter text-7xl md:text-[10vw] inline-block text-pretty break-keep leading-[.99] uppercase  text-center">
           Creative Systems, Scalable Code
-        </h1>
+        </Headline>
 
         <div class="flex gap-2 items-end  w-full flex-col">
           <div class="md:w-1/2">
-            <h2 class="text-lg uppercase tracking-wider text-neutral-500 mb-1">
+            <h2 class="hero-tagline text-lg uppercase tracking-wider text-neutral-500 mb-1">
               Software Engineer | Frontend Architect | Digital Craftsman
             </h2>
-            <h4 class=" text-4xl md:text-[5vw] uppercase font-light leading-tight tracking-tighter">
+            <h4 class="hero-name text-4xl md:text-[5vw] uppercase font-light leading-tight tracking-tighter">
               Judah Sullivan
             </h4>
-            <p>Located Currently in Houston, TX</p>
-            <p class="">Currently Open To Work! </p>
+            <p class="hero-description">Located Currently in Houston, TX</p>
+            <p class="hero-description">Currently Open To Work! </p>
 
-            <p class="text-2xl underline mt-3 font-extrabold uppercase">
+            <PillLink href="/contact" className="mt-4">
               Lets Connect
-            </p>
+            </PillLink>
           </div>
         </div>
+ <!--    {image && (  -->
+ <!-- <DirectusImage  -->
+ <!--      imageId={image} -->
+ <!--    /> -->
+ <!--    )} -->
       </div>
 
   <script src="./BlockHero.barba.ts"></script>
+  
 </Section>
 
 

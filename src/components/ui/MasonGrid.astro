@@ -1,17 +1,26 @@
 ---
 import DirectusImage from '@/components/ui/DirectusImage.astro';
 import Link from '@/components/ui/Link.astro';
-import type { Posts } from '@/types/directusCollection';
+
+// Define a normalized shape that both posts and projects map to
+type CardItem = {
+  slug?: string | null;
+  title?: string | null;
+  description?: string | null;
+  image?: string | null;
+  published_at?: string | null;
+};
 
 interface Props {
-  posts: Posts[];
+  posts: CardItem[];
   class?: string;
+  base?: 'post' | 'project';
 }
 
-const { posts, class: className } = Astro.props;
+const { posts, class: className, base = 'post' } = Astro.props as Props;
 
-function getSummary(post: Posts): string {
-  const raw = (post.description || post.content || '') as string;
+function getSummary(post: CardItem): string {
+  const raw = (post.description || '') as string;
   if (!raw) return '';
   // Strip HTML tags if content is rich text
   const text = raw.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -23,16 +32,24 @@ function getSummary(post: Posts): string {
   <div class="columns-1 md:columns-2 lg:columns-3" style="column-gap: 1.5rem;">
     {posts.map((post) => (
       <div class="mb-6 break-inside-avoid rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
-        <Link href={`/post/${post.slug}`}>
+        <Link href={`/${base}/${post.slug}`} class="group block relative">
           {post.image && (
-            <DirectusImage
-              imageId={post.image}
-              alt={post.title || 'Post image'}
-              class="w-full h-auto block object-cover hover:scale-[1.01] transition-transform duration-300"
-            />
+            <div class="relative">
+              <DirectusImage
+                imageId={post.image}
+                alt={post.title || 'Post image'}
+                class="w-full h-auto block object-cover transition-transform duration-300 group-hover:scale-[1.01]"
+              />
+              <!-- Bubble overlay -->
+              <div class="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
+                <div class="read-more-bubble">
+                  <span class="text-[11px] font-medium tracking-wide uppercase">Read more</span>
+                </div>
+              </div>
+            </div>
           )}
           <div class="p-6">
-            <h3 class="text-xl font-semibold tracking-tight text-gray-900 mb-2 hover:text-blue-600 transition-colors">
+            <h3 class="text-xl font-semibold tracking-tight text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
               {post.title}
             </h3>
             {getSummary(post) && (
@@ -58,5 +75,35 @@ function getSummary(post: Posts): string {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+  /* Bubble overlay styles and animations */
+  .read-more-bubble {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.875rem;
+    border-radius: 9999px;
+    background: rgb(99 102 241); /* indigo-500 */
+    color: white;
+    box-shadow: 0 10px 25px -5px rgba(99,102,241,0.5), 0 8px 10px -6px rgba(99,102,241,0.4);
+    transform: translateY(16px) scale(0.98);
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .group:hover .read-more-bubble {
+    animation: bubbleIn 450ms cubic-bezier(.2,.9,.1,1) forwards;
+  }
+  .group:not(:hover) .read-more-bubble {
+    animation: bubbleOut 320ms cubic-bezier(.2,.9,.1,1) forwards;
+  }
+  @keyframes bubbleIn {
+    0% { transform: translateY(16px) scale(0.94); opacity: 0; }
+    60% { transform: translateY(-2px) scale(1.02); opacity: 1; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  @keyframes bubbleOut {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-12px) scale(0.98); opacity: 0; }
   }
 </style>

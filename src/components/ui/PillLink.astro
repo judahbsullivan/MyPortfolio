@@ -1,0 +1,27 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"a"> {
+  href: string;
+  label?: string;
+  className?: string;
+}
+
+const { href, label, class: cls, className, ...rest } = Astro.props as Props & any;
+const classes = [
+  "inline-flex items-center gap-2 px-6 py-3 rounded-full border relative overflow-hidden",
+  "border-neutral-800 bg-neutral-900/50 text-white",
+  "uppercase tracking-wide text-sm md:text-base",
+  "hover:border-neutral-700 transition-colors duration-200",
+  "group",
+  cls,
+  className,
+].filter(Boolean).join(" ");
+---
+
+<a href={href} class={classes} {...rest}>
+  <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+  <span class="relative z-10">{label ? label : <slot />}</span>
+</a>
+
+

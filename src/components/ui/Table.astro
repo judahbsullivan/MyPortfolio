@@ -1,17 +1,26 @@
 ---
 import Link from '@/components/ui/Link.astro';
-import type { Posts } from '@/types/directusCollection';
 import DirectusImage from '@/components/ui/DirectusImage.astro';
 
+// Normalized card shape shared with MasonGrid
+type CardItem = {
+  slug?: string | null;
+  title?: string | null;
+  description?: string | null;
+  image?: string | null;
+  published_at?: string | null;
+};
+
 interface Props {
-  posts: Posts[];
+  posts: CardItem[];
   class?: string;
+  base?: 'post' | 'project';
 }
 
-const { posts, class: className } = Astro.props;
+const { posts, class: className, base = 'post' } = Astro.props as Props;
 
-function getSummary(post: Posts): string {
-  const raw = (post.description || post.content || '') as string;
+function getSummary(post: CardItem): string {
+  const raw = (post.description || '') as string;
   if (!raw) return '';
   const text = raw.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   return text;
@@ -22,7 +31,7 @@ function getSummary(post: Posts): string {
   <div id="posts-table-wrap" class="relative divide-y divide-gray-200 border-t border-gray-200">
     {posts.map((post, index) => (
       <Link
-        href={`/post/${post.slug}`}
+        href={`/${base}/${post.slug}`}
         class="post-row group relative flex items-baseline justify-between gap-6 py-5"
         data-index={index}
       >
@@ -126,8 +135,8 @@ function getSummary(post: Posts): string {
       // Offset a bit to the right of the cursor
       const offsetX = 24;
       const offsetY = -20;
-      preview.style.left = `${x + offsetX}px`;
-      preview.style.top = `${y + offsetY}px`;
+      (preview as HTMLElement).style.left = `${x + offsetX}px`;
+      (preview as HTMLElement).style.top = `${y + offsetY}px`;
     };
 
     tableWrap.addEventListener('mousemove', follow);
