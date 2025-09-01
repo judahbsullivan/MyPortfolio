@@ -4,26 +4,72 @@ import { getItems } from '@/directus/queries/utils';
 import Section from '@/layouts/Section.astro';
 import MasonGrid from '@/components/ui/MasonGrid.astro';
 import Table from '@/components/ui/Table.astro';
+import ParallaxGrid from '@/components/ui/ParallaxGrid.astro';
+import CarouselGrid from '@/components/ui/CarouselGrid.astro';
 
 const props = Astro.props as BlockPosts;
-const { headline, tagline, limit, collection } = props;
+const { headline, tagline, limit, collection, layouts } = props;
 
-// Resolve safe defaults
-const resolvedCollection = typeof collection === 'string' && collection.trim() ? collection : 'posts';
-const resolvedLimit = typeof limit === 'number' && Number.isFinite(limit) && limit > 0 ? limit : undefined;
+// Show controls only on actual blog/projects pages, not when used as a block on other pages
+const currentPath = Astro.url?.pathname || '/';
+const isBlogOrProjectsPage = currentPath === '/blog' || currentPath === '/projects';
 
-// Fetch items from the specified collection with guards so SSR can't break the page
+console.log('BlockPosts props:', { headline, tagline, limit, collection, layouts, isBlogOrProjectsPage });
+console.log('Layouts prop value:', layouts);
+console.log('Layouts prop type:', typeof layouts);
+
+// Simple data structure for reusable block
 type CardItem = { slug?: string | null; title?: string | null; description?: string | null; image?: string | null; published_at?: string | null };
 let items: any[] = [];
-try {
-  items = await getItems<any>(resolvedCollection, resolvedLimit as any);
-} catch (err) {
-  console.error('Failed to load items for BlockPosts:', err);
-  items = [];
+
+// Fetch data if collection is specified
+if (collection) {
+  try {
+    const resolvedLimit = typeof limit === 'number' && Number.isFinite(limit) && limit > 0 ? limit : undefined;
+    items = await getItems<any>(collection, resolvedLimit as any);
+    console.log('BlockPosts: Fetched items from collection:', collection, items);
+    
+    // Add fallback data if no items returned
+    if (!items || items.length === 0) {
+      console.log('BlockPosts: No items returned from collection, using fallback data');
+      items = [
+        {
+          slug: 'fallback-post-1',
+          title: 'Fallback Post 1',
+          description: 'This is fallback data when collection returns no items.',
+          image: 'https://picsum.photos/800/600?random=1',
+          published_at: new Date().toISOString()
+        },
+        {
+          slug: 'fallback-post-2',
+          title: 'Fallback Post 2', 
+          description: 'Another fallback post for testing layouts.',
+          image: 'https://picsum.photos/800/600?random=2',
+          published_at: new Date().toISOString()
+        }
+      ];
+    }
+  } catch (err) {
+    console.error('Failed to load items for BlockPosts:', err);
+    items = [];
+  }
+} else {
+  console.log('BlockPosts: No collection specified, no data will be fetched');
+  // Add fallback data for testing
+  items = [
+    {
+      slug: 'test-post-1',
+      title: 'Test Post 1',
+      description: 'This is a test post to ensure the component works.',
+      image: 'https://picsum.photos/800/600?random=1',
+      published_at: new Date().toISOString()
+    }
+  ];
 }
 
 // Normalize to common shape for grid/table
-const base = resolvedCollection === 'projects' ? 'project' : 'post';
+const base = collection === 'projects' ? 'project' : 'post';
+console.log('BlockPosts: Base path set to:', base, 'for collection:', collection);
 const normalized: CardItem[] = (items || []).map((it: any) => ({
   slug: it?.slug ?? null,
   title: it?.title ?? null,
@@ -32,19 +78,23 @@ const normalized: CardItem[] = (items || []).map((it: any) => ({
   published_at: (base === 'project' ? it?.date_created : it?.published_at) ?? null,
 }));
 
+console.log('BlockPosts normalized items:', normalized);
+console.log('BlockPosts items count:', normalized?.length || 0);
+
 // For now, let's create some mock categories since Posts doesn't have tags
 // In a real implementation, you'd need to add a tags field to your Posts collection
 const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
 ---
 
-<Section id="posts-block" fullWidth class="relative overflow-hidden">
+<Section id="posts-block" fullWidth class="relative overflow-hidden" data-initial-layout={layouts || 'mason'}>
+
+  
   <!-- Hero Section -->
-  <div class="flex w-full px-6 items-center flex-col justify-between pt-10 pb-6 gap-24 relative z-10">
+  <div class="flex w-full px-6 items-center flex-col justify-between pt-10 pb-6 gap-24 relative z-10 min-h-screen">
     <h1 class="posts-headline transition-all tracking-tighter text-7xl md:text-[10vw] inline-block text-pretty break-keep leading-[.99] uppercase text-center">
       {headline || "Latest Posts"}
     </h1>
-<!-- 
-    <div class="flex gap-2 items-end w-full flex-col">
+    <!-- <div class="flex gap-2 items-end w-full flex-col">
       <div class="md:w-1/2">
         <h2 class="text-lg uppercase tracking-wider text-neutral-500 mb-1">
           {tagline || "Discover our latest articles and insights"}
@@ -56,68 +106,197 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
           Explore our curated collection of articles, tutorials, and thoughts
         </p>
       </div>
-    </div>
-  </div> -->
+    </div> -->
 
-  <!-- Controls Section -->
+  <!-- Controls Section - Only show on blog/projects pages -->
+  {isBlogOrProjectsPage && (
+    <div class="px-6 py-12 w-full">
+      <div class="max-w-7xl mx-auto">
+        <!-- Category Filters -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Filter by Category</h3>
+          <div class="flex flex-wrap gap-3">
+            <button 
+              class="category-btn active px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              data-category="all"
+            >
+              All {collection === 'projects' ? 'Projects' : 'Posts'}
+            </button>
+            {mockCategories.map((category) => (
+              <button 
+                class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+                data-category={category}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <!-- layouts Toggle -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <div class="text-sm text-gray-600">
+            <span id="post-count">{normalized?.length || 0}</span> items found
+          </div>
+          <div class="hidden md:flex items-center gap-2 bg-gray-200 rounded-lg p-1 overflow-x-auto">
+            <button 
+              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors ${layouts === 'mason' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+              data-layouts="mason"
+            >
+              Grid
+            </button>
+            <button 
+              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors ${layouts === 'table' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+              data-layouts="table"
+            >
+              Table
+            </button>
+            <button 
+              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors ${layouts === 'parallax' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+              data-layouts="parallax"
+            >
+              Parallax
+            </button>
+            <button 
+              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors ${layouts === 'carousel' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+              data-layouts="carousel"
+            >
+              Carousel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- Posts Content Section -->
   <div class="px-6 py-12 w-full">
     <div class="max-w-7xl mx-auto">
-      <!-- Category Filters -->
-      <div class="mb-8">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Filter by Category</h3>
-        <div class="flex flex-wrap gap-3">
-          <button 
-            class="category-btn active px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-            data-category="all"
-          >
-            All Posts
-          </button>
-          {mockCategories.map((category) => (
-            <button 
-              class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
-              data-category={category}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <!-- Layout Toggle -->
-      <div class="flex justify-between items-center mb-8">
-        <div class="text-sm text-gray-600">
-          <span id="post-count">{normalized?.length || 0}</span> items found
-        </div>
-        <div class="hidden md:flex items-center gap-2 bg-gray-200 rounded-lg p-1">
-          <button 
-            class="layout-btn active px-3 py-2 bg-white text-gray-900 rounded-md text-sm font-medium shadow-sm transition-all"
-            data-layout="mason"
-          >
-            Grid
-          </button>
-          <button 
-            class="layout-btn px-3 py-2 text-gray-600 rounded-md text-sm font-medium hover:text-gray-900 transition-colors"
-            data-layout="table"
-          >
-            Table
-          </button>
-        </div>
-      </div>
-
       <!-- Posts Container -->
-      <div id="posts-container" class="posts-mason">
+      <div id="posts-container" class={`posts-mason ${layouts === 'mason' ? '' : 'hidden'}`}>
         <MasonGrid posts={normalized} base={base} />
       </div>
       
-      <div id="posts-table" class="posts-table hidden md:hidden">
+      <div id="posts-table" class={`posts-table ${layouts === 'table' ? '' : 'hidden'}`}>
         <Table posts={normalized} base={base} />
       </div>
+
+      <div id="posts-parallax" class={`posts-parallax ${layouts === 'parallax' ? '' : 'hidden'}`}>
+        <ParallaxGrid posts={normalized} base={base} />
+      </div>
+
+      <div id="posts-carousel" class={`posts-carousel ${layouts === 'carousel' ? '' : 'hidden'}`}>
+        <CarouselGrid posts={normalized} base={base} />
+      </div>
+      
       {(!normalized || normalized.length === 0) && (
-        <div class="mt-8 text-center text-gray-500">No posts found.</div>
+        <div class="mt-8 text-center text-gray-500">
+          <p>No posts found.</p>
+          <p class="text-sm mt-2">Collection: {collection || 'None'}, Layouts: {layouts}</p>
+          <p class="text-sm mt-2">Items count: {items?.length || 0}, Normalized count: {normalized?.length || 0}</p>
+          <p class="text-sm mt-2">Is Blog/Projects Page: {isBlogOrProjectsPage ? 'Yes' : 'No'}</p>
+        </div>
       )}
     </div>
   </div>
 
-  <script src="./BlockPosts.barba.ts"></script>
-</Section>
+
+  <script>
+    // Layout switching logic
+    import registerBlockPostsHooks from './BlockPosts.barba.ts';
+    import registerParallaxGridHooks from '@/components/ui/ParallaxGrid.barba.ts';
+    import { animateTableRows, initializeTablePreview } from '@/components/ui/Table.barba.ts';
+    import { initializeParallaxLayout } from '@/components/ui/ParallaxGrid.barba.ts';
+    
+    registerBlockPostsHooks();
+    registerParallaxGridHooks();
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      const layoutButtons = document.querySelectorAll('.layouts-btn');
+      const postsContainer = document.getElementById('posts-container');
+      const postsTable = document.getElementById('posts-table');
+      const postsParallax = document.getElementById('posts-parallax');
+      const postsCarousel = document.getElementById('posts-carousel');
+      
+      // Get initial layout from CMS prop
+      const postsBlock = document.querySelector('#posts-block');
+      const initialLayout = postsBlock?.getAttribute('data-initial-layout') || 'mason';
+      console.log('Posts block element:', postsBlock);
+      console.log('Data initial layout attribute:', postsBlock?.getAttribute('data-initial-layout'));
+      console.log('Initial layout from CMS:', initialLayout);
+      
+      // Set initial layout for ALL pages first
+      console.log('Setting initial layout to:', initialLayout);
+      if (postsContainer) postsContainer.style.display = initialLayout === 'mason' ? 'block' : 'none';
+      if (postsTable) postsTable.style.display = initialLayout === 'table' ? 'block' : 'none';
+      if (postsParallax) postsParallax.style.display = initialLayout === 'parallax' ? 'block' : 'none';
+      if (postsCarousel) postsCarousel.style.display = initialLayout === 'carousel' ? 'block' : 'none';
+      
+      // Check if we're on blog/projects page (has layout buttons)
+      const isBlogOrProjectsPage = layoutButtons.length > 0;
+      console.log('Is blog/projects page:', isBlogOrProjectsPage);
+      
+      if (isBlogOrProjectsPage) {
+        // Blog/Projects pages: Start with CMS layout, allow switching
+        console.log('Blog/Projects page: Starting with CMS layout, allowing switching');
+        
+        // Layout button event listeners
+        layoutButtons.forEach(button => {
+          button.addEventListener('click', async (e) => {
+            const target = e.target as HTMLElement;
+            const layout = target.getAttribute('data-layouts') || 'mason';
+            
+            // Update active state
+            layoutButtons.forEach(btn => {
+              btn.classList.remove('active', 'bg-white', 'text-gray-900', 'shadow-sm');
+              btn.classList.add('text-gray-600');
+            });
+            target.classList.add('active', 'bg-white', 'text-gray-900', 'shadow-sm');
+            target.classList.remove('text-gray-600');
+            
+            // Show/hide layouts
+            if (postsContainer) postsContainer.style.display = layout === 'mason' ? 'block' : 'none';
+            if (postsTable) postsTable.style.display = layout === 'table' ? 'block' : 'none';
+            if (postsParallax) postsParallax.style.display = layout === 'parallax' ? 'block' : 'none';
+            if (postsCarousel) postsCarousel.style.display = layout === 'carousel' ? 'block' : 'none';
+            
+            // Re-initialize animations for the new layout
+            setTimeout(() => {
+              if (layout === 'table') {
+                // Re-initialize table animations
+                console.log('Re-initializing table animations');
+                animateTableRows();
+                initializeTablePreview();
+              } else if (layout === 'parallax') {
+                // Re-initialize parallax animations
+                console.log('Re-initializing parallax animations');
+                initializeParallaxLayout();
+              } else if (layout === 'carousel') {
+                // Re-initialize carousel animations (if needed)
+                console.log('Carousel layout selected');
+              } else if (layout === 'mason') {
+                // Re-initialize masonry animations (if needed)
+                console.log('Mason layout selected');
+              }
+            }, 100);
+            
+            console.log('Switched to layout:', layout);
+          });
+        });
+        
+        // Set initial active button
+        const activeButton = document.querySelector(`[data-layouts="${initialLayout}"]`);
+        if (activeButton) {
+          activeButton.classList.add('active', 'bg-white', 'text-gray-900', 'shadow-sm');
+          activeButton.classList.remove('text-gray-600');
+        }
+      } else {
+        // Other pages: Use only the CMS layout, no switching
+        console.log('Other page: Using only CMS layout, no switching');
+        // Layout is already set above for all pages
+      }
+    });
+  </script>
+  </Section>
+  </Section>
 

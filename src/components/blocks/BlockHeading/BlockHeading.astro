@@ -4,7 +4,7 @@ import type {BlockHeading} from "@/types/directusCollection";
 
 
 const props = Astro.props as BlockHeading;
-const {tagline, description, heading } = props;
+const {tagline, description, headline } = props;
 ---
 
 
@@ -20,9 +20,9 @@ const {tagline, description, heading } = props;
           {tagline}
         </p>
       )}
-      {heading && (
+      {headline && (
         <h1 class="heading-title text-5xl md:text-5xl lg:text-6xl xl:text-8xl leading-tight tracking-tight text-gray-900">
-          {heading}
+          {headline}
         </h1>
       )}
     </div>

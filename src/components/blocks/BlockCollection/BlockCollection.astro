@@ -1,5 +1,10 @@
 ---
 import DirectusImage from '@/components/ui/DirectusImage.astro';
+import MasonGrid from '@/components/ui/MasonGrid.astro';
+import ParallaxGrid from '@/components/ui/ParallaxGrid.astro';
+import CarouselGrid from '@/components/ui/CarouselGrid.astro';
+import Table from '@/components/ui/Table.astro';
+import PillLink from '@/components/ui/PillLink.astro';
 import type {
   BlockCollection,
   Posts,
@@ -8,16 +13,57 @@ import type {
 import Section from '@/layouts/Section.astro';
 import Button from '@/components/ui/Button.astro';
 import { getItems } from '@/directus/queries/utils';
+import { getProject } from '@/directus/queries/project';
+import { getArticles } from '@/directus/queries/articles';
 
 const props = Astro.props as BlockCollection;
-const { tagline, headline, limit, collection } = props;
+const { tagline, headline, limit, collection, layouts } = props;
 
-const items = await getItems<Posts | Projects>(
-  collection as string,
-  Number(limit)
-);
+// Debug logging
+console.log('BlockCollection props:', { tagline, headline, limit, collection, layouts });
+console.log('Collection type:', typeof collection, 'Value:', collection);
 
-const basePath = collection === 'projects' ? '/project' : '/post';
+// Use appropriate query function based on collection type
+let items: any[];
+if (collection === 'projects') {
+  console.log('Fetching projects...');
+  items = await getProject() as Projects[];
+  console.log('Projects fetched:', items);
+} else {
+  console.log('Fetching posts...');
+  items = await getArticles() as Posts[];
+  console.log('Posts fetched:', items);
+}
+
+// Apply limit if specified
+if (limit && Number(limit) > 0) {
+  items = items.slice(0, Number(limit));
+}
+
+// Normalize items to have consistent structure based on collection type
+const normalized = items.map((item) => {
+  if (collection === 'projects') {
+    // Projects structure
+    return {
+      slug: item.slug,
+      title: item.title,
+      description: item.description,
+      image: (item as Projects).cover_image,
+      published_at: (item as Projects).date_created
+    };
+  } else {
+    // Posts structure
+    return {
+      slug: item.slug,
+      title: item.title,
+      description: item.description,
+      image: (item as Posts).image,
+      published_at: (item as Posts).published_at
+    };
+  }
+});
+
+const basePath = collection === 'projects' ? '/projects' : '/blog';
 const label = collection === 'projects' ? 'Project' : 'Post';
 ---
 
@@ -38,65 +84,25 @@ const label = collection === 'projects' ? 'Project' : 'Post';
     )}
   </div>
 
-  <!-- Cards Grid -->
-  <div class="grid grid-cols-1 gap-6 w-full">
-    {items.map((item) => (
-    <article
-      class="collection-card group relative overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch"
-      id={item.id as string}
-      data-slug={`${basePath}/${item.slug ?? item.id}`}
-    >
-      <div class="flex flex-col gap-2 p-4">
-        <h5 class="card-title font-semibold text-2xl">{item.title ?? item.headline}</h5>
-        {item.description && (
-        <p class="card-description text-sm text-gray-700">{item.description}</p>
-        )}
-        <a
-          href={`${basePath}/${item.slug ?? item.id}`}
-          class="text-pretty font-medium hover:underline"
-        >
-          Read More →
-        </a>
-      </div>
-
-      {item.image ? (
-      <div class="collection-image flex items-center p-4  justify-center relative h-64  w-full bg-black md:h-96 lg:h-[500px] overflow-hidden rounded">
-        <DirectusImage
-          imageId={item.image as string}
-          class=" object-cover  aspect-video m-4 lg:z-0 "
-        />
-
-        <Button
-          className="hidden md:flex absolute left-0 top-0 bottom-0 right-0 z-50 bg-black"
-        >
-          View { item.title}
-        </Button>
-      </div>
-      ) : (
-
-      <div class="collection-image relative h-64  md:h-96 lg:h-[500px] overflow-hidden rounded">
-        <div
-          class=" bg-gray-200 rounded h-64 md:h-96 lg:h-[500px] animate-pulse"
-        />
-        <Button
-          className="hidden md:flex absolute left-0 top-0 bottom-0 right-0 z-50 bg-black"
-        >
-          View { item.title}
-        </Button>
-      </div>
-      )}
-    </article>
-    ))}
-
-  </div>
+  <!-- Layout Components -->
+  {layouts === 'mason' && <MasonGrid posts={normalized} base={collection === 'projects' ? 'project' : 'post'} />}
+  {layouts === 'parallax' && <ParallaxGrid posts={normalized} base={collection === 'projects' ? 'project' : 'post'} />}
+  {layouts === 'carousel' && <CarouselGrid posts={normalized} base={collection === 'projects' ? 'project' : 'post'} />}
+  {layouts === 'list' && <Table posts={normalized} base={collection === 'projects' ? 'project' : 'post'} />}
 
   <!-- View All Button -->
-  <a href={basePath} class="mt-12">
-    <Button className="desc-btn">View All {label}s</Button>
-  </a>
+  <div class="mt-12">
+    <PillLink href={basePath}>
+      View All {label}s
+    </PillLink>
+  </div>
 
-  <script >
-  import registerBlockCollectionHooks from './BlockCollection.barba.ts';
-  registerBlockCollectionHooks();
+  <script>
+    import registerBlockCollectionHooks from './BlockCollection.barba.ts';
+    import registerTableHooks from '@/components/ui/Table.barba.ts';
+    import registerParallaxGridHooks from '@/components/ui/ParallaxGrid.barba.ts';
+    registerBlockCollectionHooks();
+    registerTableHooks();
+    registerParallaxGridHooks();
   </script>
 </Section>

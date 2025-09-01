@@ -1,13 +1,14 @@
 ---
-import type { Projects, BlockProjects } from '@/types/directusCollection';
+import type { Projects, BlockCollection } from '@/types/directusCollection';
 import ItemList from '@/components/ui/ItemList.astro';
 import ItemCard from '@/components/ui/ItemCard.astro';
 import { getItems } from '@/directus/queries/utils';
 import Section from '@/layouts/Section.astro';
 import Button from '@/components/ui/Button.astro';
 import DirectusImage from '@/components/ui/DirectusImage.astro';
+import PillLink from '@/components/ui/PillLink.astro';
 
-const { headline, tagline, limit, collection } = Astro.props as BlockProjects;
+const { headline, tagline, limit, collection } = Astro.props as BlockCollection;
 const projects = await getItems<Projects>(collection as string, limit as any);
 ---
 
@@ -85,9 +86,9 @@ const projects = await getItems<Projects>(collection as string, limit as any);
   <!-- View All Button -->
   <div class="flex justify-center pt-8 overflow-hidden">
     <div class="inline-block scale-0 transition-transform">
-      <Button>
+      <PillLink href={`/${collection}`}>
         View more {collection}
-      </Button>
+      </PillLink>
     </div>
   </div>
 

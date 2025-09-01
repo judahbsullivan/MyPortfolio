@@ -1,7 +1,9 @@
 import { apiUrl } from '@/types/env'
-import { createDirectus, rest } from '@directus/sdk';
+import { createDirectus, rest, authentication } from '@directus/sdk';
 
-const directusClient = createDirectus(apiUrl).with(rest());
+const directusClient = createDirectus(apiUrl)
+  .with(authentication())
+  .with(rest());
 
 export default directusClient;
 

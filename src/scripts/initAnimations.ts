@@ -36,7 +36,9 @@ if (typeof window !== "undefined") {
     const modules = import.meta.glob(
       [
         "src/components/blocks/*/*.barba.ts",
-        "src/layouts/*/*.barba.ts"
+        "src/layouts/*/*.barba.ts",
+        "src/components/ui/*/*.barba.ts",
+        "src/components/ui/*.barba.ts"
       ],
       { eager: true }
     );

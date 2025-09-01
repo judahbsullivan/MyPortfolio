@@ -1,0 +1,79 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import DirectusImage from "./DirectusImage/DirectusImage.astro";
+
+type CardItem = {
+  slug?: string | null;
+  title?: string | null;
+  description?: string | null;
+  image?: string | null;
+  published_at?: string | null;
+};
+
+interface Props extends HTMLAttributes<"div"> {
+  posts: CardItem[];
+  base?: 'post' | 'project';
+}
+
+const { posts, base = 'post', class: className, ...rest } = Astro.props as Props;
+---
+
+<div class={`relative overflow-hidden ${className || ''}`} {...rest}>
+  <div class="flex animate-scroll">
+    {posts.map((item, index) => (
+      <div class="flex-shrink-0 mx-4" style="width: 420px;" data-index={index}>
+        <div class="carousel-container relative aspect-video w-full overflow-hidden rounded-2xl group">
+          {item.image && (
+            item.image.startsWith('http') ? (
+              <img src={item.image} alt={item.title || ''} class="carousel-image w-[150%] h-[150%] object-cover absolute inset-0" loading="lazy" />
+            ) : (
+              <DirectusImage imageId={item.image} alt={item.title || ''} class="carousel-image w-[150%] h-[150%] object-cover absolute inset-0" />
+            )
+          )}
+          <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="text-white text-center p-6">
+              <h3 class="text-xl md:text-2xl font-bold mb-3">{item.title}</h3>
+              <p class="text-sm md:text-base mb-4">{item.description}</p>
+              <a href={`/${base}/${item.slug}`} class="inline-block px-4 py-2 bg-white text-black rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
+                Read More
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+    {/* Duplicate items for seamless loop */}
+    {posts.map((item, index) => (
+      <div class="flex-shrink-0 mx-4" style="width: 420px;" data-index={`duplicate-${index}`}> 
+        <div class="carousel-container relative aspect-video w-full overflow-hidden rounded-2xl group">
+          {item.image && (
+            item.image.startsWith('http') ? (
+              <img src={item.image} alt={item.title || ''} class="carousel-image w-[150%] h-[150%] object-cover absolute inset-0" loading="lazy" />
+            ) : (
+              <DirectusImage imageId={item.image} alt={item.title || ''} class="carousel-image w-[150%] h-[150%] object-cover absolute inset-0" />
+            )
+          )}
+          <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="text-white text-center p-6">
+              <h3 class="text-xl md:text-2xl font-bold mb-3">{item.title}</h3>
+              <p class="text-sm md:text-base mb-4">{item.description}</p>
+              <a href={`/${base}/${item.slug}`} class="inline-block px-4 py-2 bg-white text-black rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
+                Read More
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-scroll {
+    animation: scroll 30s linear infinite;
+  }
+</style>

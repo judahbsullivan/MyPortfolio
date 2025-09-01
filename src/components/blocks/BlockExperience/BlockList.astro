@@ -1,5 +1,5 @@
 ---
-import type { BlockList } from "@/types/directusCollection";
+import type { BlockExperience } from "@/types/directusCollection";
 import Section from "@/layouts/Section.astro";
 import Button from "@/components/ui/Button.astro";
 
@@ -27,7 +27,7 @@ const { tagline, headline, description, jobs: list } = Astro.props;
 
 
   <div class="flex flex-col gap-16 w-full">
-    {list?.map((job) => (
+    {list?.map((job: { title: unknown; company: unknown; location: unknown; date: unknown; bullets: string[]; }) => (
       <div class="flex flex-col gap-4">
         <h4 class="text-4xl font-semibold desc-title">
           {job.title} <span class="font-light">@ {job.company}</span>

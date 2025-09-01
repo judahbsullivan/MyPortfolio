@@ -1,0 +1,73 @@
+---
+import DirectusImage from '@/components/ui/DirectusImage.astro';
+import Link from '@/components/ui/Link.astro';
+
+type CardItem = {
+  slug?: string | null;
+  title?: string | null;
+  description?: string | null;
+  image?: string | null;
+  published_at?: string | null;
+};
+
+interface Props {
+  posts: CardItem[];
+  class?: string;
+  base?: 'post' | 'project';
+}
+
+const { posts, class: className, base = 'post' } = Astro.props as Props;
+---
+
+<div class={`space-y-4 md:space-y-8 w-full px-4 md:px-6 ${className || ''}`}>
+  {posts.map((post, index) => (
+    <div class="parallax-item relative" data-index={index}>
+      <!-- Image Container -->
+      <div class="parallax-container relative w-full max-w-4xl mx-auto aspect-video overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl mb-4">
+        {post.image && (
+          <div class="parallax-image-wrapper absolute inset-0 w-full h-full">
+            {post.image.startsWith('http') ? (
+              <img
+                src={post.image}
+                alt={post.title || 'Post image'}
+                class="parallax-image w-[120%] md:w-[133%] h-[120%] md:h-[133%] object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <DirectusImage
+                imageId={post.image}
+                alt={post.title || 'Post image'}
+                class="parallax-image w-[120%] md:w-[133%] h-[120%] md:w-[133%] object-cover"
+              />
+            )}
+          </div>
+        )}
+        
+        <!-- Hover Bubble -->
+        <div class="hover-bubble absolute bg-white/90 text-black px-2 py-1 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-medium opacity-0 pointer-events-none z-10">
+          Read this {base === 'project' ? 'Project' : 'Post'}
+        </div>
+      </div>
+      
+      <!-- Content Below Image -->
+      <div class="parallax-content text-left max-w-4xl mx-auto">
+        <h3 class="parallax-title text-lg md:text-2xl lg:text-3xl font-bold mb-2 md:mb-4 text-gray-900">
+          {post.title}
+        </h3>
+        <p class="parallax-description text-sm md:text-base lg:text-lg mb-3 md:mb-6 text-gray-600 line-clamp-2 md:line-clamp-3">
+          {post.description}
+        </p>
+        <div class="overflow-hidden">
+          <Link href={`/${base}/${post.slug}`} class="parallax-link inline-block px-4 py-2 md:px-6 md:py-3 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors text-sm md:text-base">
+            Read More
+          </Link>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+<script>
+  import registerParallaxGridHooks from './ParallaxGrid.barba.ts';
+  registerParallaxGridHooks();
+</script>

@@ -6,12 +6,20 @@ import Section from "@/layouts/Section.astro";
 import type { BlockButton, BlockDescription } from "@/types/directusCollection";
 
 const props = Astro.props as BlockDescription;
-const { tagline, headline, description, button_group } = props;
+const { tagline, headline, description } = props;
 
-const buttons: BlockButton[] =
-  typeof button_group === "object" && Array.isArray(button_group?.buttons)
-    ? (button_group.buttons as BlockButton[] )
-    : [];
+const buttons: BlockButton[] = [];
+
+// If PinterestImage is not defined, define a minimal type for it
+type PinterestImage = {
+  id: string;
+  imageUrl: string;
+  title: string;
+  width: number;
+  height: number;
+  tags: string[];
+  slug: string;
+};
 
 const images: PinterestImage[] = [
   {
