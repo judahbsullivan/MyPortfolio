@@ -9,6 +9,13 @@ export default function registerBlockPostsHooks() {
 
   gsap.registerPlugin(SplitText, ScrollTrigger);
   
+  // Initialize on first page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeOnLoad);
+  } else {
+    initializeOnLoad();
+  }
+  
   barba.hooks.afterEnter(({ next }: any) => {
     setTimeout(() => {
       const el = document.querySelector("#posts-block");
@@ -26,7 +33,23 @@ export default function registerBlockPostsHooks() {
   });
 }
 
+function initializeOnLoad() {
+  const currentPath = window.location.pathname;
+  const isBlogOrProjectsPage = currentPath === '/blog' || currentPath === '/projects';
+  
+  if (isBlogOrProjectsPage) {
+    // Small delay to ensure DOM is ready
+    setTimeout(() => {
+      initializePostsInteractivity();
+    }, 100);
+  }
+}
+
 function initializePostsInteractivity() {
+  // Check if we're on blog or projects page
+  const currentPath = window.location.pathname;
+  const isBlogOrProjectsPage = currentPath === '/blog' || currentPath === '/projects';
+  
   // Category filtering
   const categoryButtons = document.querySelectorAll('.category-btn');
   const layoutButtons = document.querySelectorAll('.layouts-btn');
