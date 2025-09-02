@@ -46,6 +46,8 @@ const props = Astro.props as Pages;
 const postSlug = Astro.url.pathname.startsWith(`/post/`);
 const projectSlug = Astro.url.pathname.startsWith(`/project/`);
 const isPage = !postSlug === !projectSlug;
+
+
 ---
 
 <Layout

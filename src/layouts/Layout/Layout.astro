@@ -6,12 +6,15 @@ import Navigation from "@/components/globals/navigation/Navigation.astro";
 import Footer from "@/components/globals/footer/Footer.astro";
 import ScrollOrb from "@/components/ui/ScrollOrb.astro";
 import { getNavigationItems } from "@/directus/queries/globals";
+import { getGlobals } from "@/directus/queries/globals";
 
 
 const {title, user_created ,seo,description, class:className} = Astro.props;
 const navItems = await getNavigationItems();
+const globals = await getGlobals();
 
 
+console.log(globals);
 ---
 
 
@@ -21,6 +24,7 @@ const navItems = await getNavigationItems();
     title={title} 
     description={description}
     seo={seo}
+    globals={globals}
   />
   <body data-barba="wrapper">
 <Mouse />

@@ -1,21 +1,86 @@
 ---
 import "@/styles/global.css"
 import MetaTag from './MetaTag.astro';
+import { fileUrl, getThumbnail } from '@/directus/queries/files';
+import type { Globals } from "@/types/directusCollection";
+
+interface SEO {
+  title?: string;
+  meta_description?: string;
+  og_image?: string | null;
+  no_index?: boolean;
+  no_follow?: boolean;
+}
+
 interface Props {
   title?: string;
   description?: string;
-  seo?: any;
-  globals?: {
-    author?: string | "Judah Sullivan";
+  seo?: SEO;
+  globals?: Globals;
+}
+const { title, globals, seo, description } = Astro.props;
+const author = globals?.meta_credentials || "Judah Sullivan";
 
+// Console log globals to see what we're getting
+
+// Use page-specific SEO data or fall back to global defaults
+const pageTitle = seo?.title || title || globals?.title || "Judah Sullivan - Full-Stack Developer & Modern Web Solutions";
+const pageDescription = seo?.meta_description || description || globals?.description || "Full-stack developer specializing in Astro, Next.js, GSAP animations, and headless CMS. Building performant web applications with modern technologies.";
+
+// Convert Directus file ID to full URL if available, otherwise use default
+let pageImage = "https://judahsullivan.dev/og-image.jpg";
+if (seo?.og_image) {
+  try {
+    pageImage = await fileUrl(seo.og_image);
+    // Add cache-busting parameter to force social platforms to re-fetch
+    pageImage += `?v=${Date.now()}`;
+  } catch (error) {
+    // If fileUrl fails, keep the default image
+    pageImage = "https://judahsullivan.dev/og-image.jpg";
   }
 }
-const { title, seo, description ,globals} = Astro.props;
-const author = globals?.author ? globals.author : "Judah Sullivan";
+
+const pageUrl = globals?.url || "https://judahsullivan.dev";
+
+// Handle favicon with fileUrl if globals exist
+const  favIcon = await fileUrl(globals?.favicon?.id);
 ---
 <head>
   <MetaTag charset="UTF-8"/>
   <MetaTag name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href={favIcon} />
+
+ 
+  
+  <!-- SEO Meta Tags -->
+  <MetaTag name="description" content={pageDescription} />
+  <MetaTag name="author" content={author} />
+  
+  {/* Robots meta tags based on SEO settings */}
+  {seo?.no_index && <MetaTag name="robots" content="noindex" />}
+  {seo?.no_follow && <MetaTag name="robots" content="nofollow" />}
+  {seo?.no_index && seo?.no_follow && <MetaTag name="robots" content="noindex, nofollow" />}
+  
+  <!-- Open Graph Meta Tags (for LinkedIn, Facebook, etc.) -->
+  <MetaTag property="og:title" content={pageTitle} />
+  <MetaTag property="og:description" content={pageDescription} />
+  <MetaTag property="og:image" content={pageImage} />
+  <MetaTag property="og:image:width" content="1200" />
+  <MetaTag property="og:image:height" content="630" />
+  <MetaTag property="og:image:type" content="image/png" />
+  <MetaTag property="og:url" content={pageUrl} />
+  <MetaTag property="og:type" content="website" />
+  <MetaTag property="og:site_name" content="Judah Sullivan Portfolio" />
+  <MetaTag property="og:locale" content="en_US" />
+  
+  <!-- Twitter Card Meta Tags -->
+  <MetaTag name="twitter:card" content="summary_large_image" />
+  <MetaTag name="twitter:title" content={pageTitle} />
+  <MetaTag name="twitter:description" content={pageDescription} />
+  <MetaTag name="twitter:image" content={pageImage} />
+  
   <script src="../../../scripts/initAnimations.ts" ></script>
-  <title>{` ${title} | ${author}`}</title>
+  <title>{pageTitle}</title>
 </head>
