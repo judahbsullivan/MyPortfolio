@@ -134,3 +134,33 @@
 
 }
 
+/* Responsive layout rules for BlockCollection and BlockPosts */
+@media (max-width: 1023px) {
+  /* Hide table layouts on mobile/tablet */
+  .table-container {
+    display: none !important;
+  }
+  
+  /* Ensure mason and parallax are visible */
+  .mason-grid,
+  .parallax-item {
+    display: block !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Show all layouts on desktop */
+  .table-container,
+  .mason-grid,
+  .parallax-item {
+    display: block !important;
+  }
+}
+
+/* Hide desktop-only buttons on mobile/tablet */
+@media (max-width: 1023px) {
+  [data-desktop-only="true"] {
+    display: none !important;
+  }
+}
+

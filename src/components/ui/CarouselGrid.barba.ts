@@ -1,9 +1,8 @@
 import barba from "@barba/core";
 import { gsap } from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import SplitText from "gsap/SplitText";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
 export default function registerCarouselGridHooks() {
   if (typeof window === "undefined") return;
@@ -11,12 +10,11 @@ export default function registerCarouselGridHooks() {
   barba.hooks.afterEnter(() => {
     setTimeout(() => {
       initializeCarouselLayout();
-    }, 1000); // Wait for overlay collapse
+    }, 500);
   });
 }
 
 export function initializeCarouselLayout() {
-
   // Kill any existing ScrollTriggers for this component to prevent conflicts
   ScrollTrigger.getAll().forEach(trigger => {
     if (trigger.vars.id && trigger.vars.id.startsWith('carousel-')) {
@@ -29,80 +27,39 @@ export function initializeCarouselLayout() {
     (window as any).initializeCarouselLayout = initializeCarouselLayout;
   }
 
-  const carouselItems = document.querySelectorAll('.carousel-container');
+  const carouselItems = document.querySelectorAll('.carousel-item');
 
   carouselItems.forEach((item, index) => {
     const image = item.querySelector('.carousel-image');
-    const content = item.querySelector('.absolute.inset-0.bg-black\\/60');
+    
+    if (!image) return;
 
-    if (!image || !content) {
-      return;
-    }
+    // Set initial state
+    gsap.set(image, { 
+      scale: 1.1, 
+      opacity: 0.8 
+    });
 
-    // Set initial state - container starts as mask, image starts scaled up
-    gsap.set(item, { clipPath: 'inset(0% 100% 0% 0%)' });
-    gsap.set(image, { scale: 1.2, x: 0 });
-    gsap.set(content, { opacity: 0 });
-
-    // Container mask reveals from left to right using clipPath
-    gsap.fromTo(item,
-      { clipPath: 'inset(0% 100% 0% 0%)' },
-      {
-        clipPath: 'inset(0% 0% 0% 0%)',
-        duration: 1.0,
-        ease: 'power3.out',
-        scrollTrigger: {
-          id: `carousel-container-${index}`,
-          trigger: item,
-          start: 'left 80%', // 20% in view before reveal
-          end: 'right 20%',
-          scrub: false,
-          onEnter: () => {
-          }
-        }
-      }
-    );
-
-    // Image scales down from 1.2 to 1 (INDEPENDENT of container scaling)
-    gsap.fromTo(image,
-      { scale: 1.2 },
-      {
-        scale: 1,
-        duration: 0.8,
-        ease: 'power3.out',
-        scrollTrigger: {
-          id: `carousel-image-${index}`,
-          trigger: item,
-          start: 'left 80%',
-          end: 'right 20%',
-          scrub: false,
-          delay: 0.2, // Start after container starts revealing
-          onEnter: () => {
-            // After image scales down, start content animations
-            setTimeout(() => {
-              gsap.to(content, { opacity: 1, duration: 0.5 });
-            }, 300);
-          }
-        }
-      }
-    );
-
-    // Subtle horizontal parallax effect as item scrolls
+    // Animate image on scroll
     gsap.to(image, {
-      x: -50, // Image slides slightly left through the container mask
-      ease: 'none',
+      scale: 1,
+      opacity: 1,
+      duration: 0.8,
+      ease: "power2.out",
       scrollTrigger: {
-        id: `carousel-effect-${index}`,
+        id: `carousel-image-${index}`,
         trigger: item,
-        start: 'left 80%',
-        end: 'right 20%',
-        scrub: 1, // Smooth scrubbing
-        delay: 0.8, // Start after container and image animations complete
-        onUpdate: (self) => {
-          // Container acts as mask - image moves through it
-          // No bounds checking needed since container clips overflow
+        start: "top 80%",
+        end: "bottom 20%",
+        scrub: false,
+        onEnter: () => {
+          // Image is now fully visible
         }
       }
     });
   });
+}
+
+if (typeof window !== 'undefined') {
+  registerCarouselGridHooks();
 }

@@ -79,10 +79,12 @@ const label = (collection === 'projects' || collection === 'project') ? 'Project
   </div>
 
   <!-- Layout Components -->
-  {layouts === 'mason' && <MasonGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
-  {layouts === 'parallax' && <ParallaxGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
-  {layouts === 'carousel' && <CarouselGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
-  {(layouts === 'list' || layouts === 'view') && <Table posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
+  <div id="collection-layouts" data-layout={layouts}>
+    {layouts === 'mason' && <MasonGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
+    {layouts === 'parallax' && <ParallaxGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
+    {layouts === 'carousel' && <CarouselGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
+    {(layouts === 'list' || layouts === 'view') && <div class="table-container"><Table posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} /></div>}
+  </div>
 
   <!-- View All Button -->
   <div class="mt-12">

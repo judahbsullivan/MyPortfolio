@@ -4,8 +4,6 @@ import type { DirectusFiles } from "@/types/directusCollection";
 import { tw } from "@/lib/tw";
 import { Image } from "astro:assets"; 
 
-
-
 interface Props {
   image?: DirectusFiles;
   imageId?: string;
@@ -14,6 +12,10 @@ interface Props {
   height?: number;
   format?: string;
   class?: string;
+  disableMask?: boolean; // Optional prop to disable mask animation
+  fillContainer?: boolean; // Optional prop to make image fill its container
+  useSimpleMask?: boolean; // Use simple CSS mask instead of GSAP-compatible one
+  scrollImage?: boolean; // Make image larger for scroll animations
 }
 
 const {
@@ -23,6 +25,10 @@ const {
   width: overrideWidth,
   height: overrideHeight,
   class: className,
+  disableMask = false,
+  fillContainer = false,
+  useSimpleMask = false,
+  scrollImage = false,
   ...rest
 } = Astro.props as Props;
 
@@ -51,17 +57,88 @@ if (typeof width !== "number" || typeof height !== "number") {
 }
 
 const src = await getThumbnail(imageId, { format: "webp", width, height });
-
 ---
 
-<Image
-  src={src}
-  alt={alt}
-  width={width}
-  height={height}
-  loading="lazy"
-  class={tw(className)}
-  {...rest}
-/>
+{fillContainer ? (
+  <Image
+    src={src}
+    alt={alt}
+    width={width}
+    height={height}
+    loading="lazy"
+    class={tw(className)}
+    {...rest}
+  />
+) : (
+  <div class={`directus-image-container overflow-hidden ${disableMask ? '' : useSimpleMask ? 'simple-mask' : 'gsap-mask'} ${scrollImage ? 'scroll-container' : ''}`}>
+    <Image
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      loading="lazy"
+      class={tw(className)}
+      {...rest}
+    />
+  </div>
+)}
+
+<style>
+  /* Simple CSS mask animation - for components without GSAP */
+  .simple-mask {
+    clip-path: inset(100% 0% 0% 0%);
+  }
+  
+  .simple-mask.animate-in {
+    clip-path: inset(0% 0% 0% 0%);
+    transition: clip-path 1.2s ease-out;
+  }
+  
+  /* GSAP-compatible mask - no CSS animation, let GSAP handle it */
+  .gsap-mask {
+    /* No initial clip-path - let GSAP set it */
+  }
+  
+  /* Scroll container styling - only for components that need it */
+  .scroll-container {
+    position: absolute;
+    inset: 0;
+  }
+  
+  .scroll-container img {
+    width: 110% !important;
+    height: 110% !important;
+    object-fit: cover;
+  }
+  
+  @media (min-width: 768px) {
+    .scroll-container img {
+      width: 123% !important;
+      height: 123% !important;
+    }
+  }
+</style>
+
+<script>
+  // Add simple mask animation on scroll for components that need it
+  document.addEventListener('DOMContentLoaded', () => {
+    const simpleMaskContainers = document.querySelectorAll('.simple-mask');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, {
+      threshold: 0.3,
+      rootMargin: '0px 0px -100px 0px'
+    });
+    
+    simpleMaskContainers.forEach((container) => {
+      observer.observe(container);
+    });
+  });
+</script>
 
 

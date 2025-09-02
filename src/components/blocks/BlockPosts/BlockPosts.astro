@@ -86,7 +86,7 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
 
   
   <!-- Hero Section -->
-  <div class="flex w-full px-6 items-center flex-col justify-between pt-10 pb-6 gap-24 relative z-10 min-h-screen">
+  <div class="flex w-full px-6 items-center flex-col justify-between pt-10 pb-6 gap-24 relative z-10 ">
     <h1 class="posts-headline transition-all tracking-tighter text-7xl md:text-[10vw] inline-block text-pretty break-keep leading-[.99] uppercase text-center">
       {headline || "Latest Posts"}
     </h1>
@@ -110,26 +110,25 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
     <div class="px-6 py-12 w-full">
       <div class="max-w-7xl mx-auto">
         <!-- Category Filters -->
-        <div class="mb-8">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">Filter by Category</h3>
-          <div class="flex flex-wrap gap-3">
-            <button 
-              class="category-btn active px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-              data-category="all"
-            >
-              All {collection === 'projects' ? 'Projects' : 'Posts'}
-            </button>
-            {mockCategories.map((category) => (
-              <button 
-                class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
-                data-category={category}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
-
+        <!-- <div class="mb-8"> -->
+        <!--   <h3 class="text-lg font-medium text-gray-900 mb-4">Filter by Category</h3> -->
+        <!--   <div class="flex flex-wrap gap-3"> -->
+        <!--     <button  -->
+        <!--       class="category-btn active px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors" -->
+        <!--       data-category="all" -->
+        <!--     > -->
+        <!--       All {collection === 'projects' ? 'Projects' : 'Posts'} -->
+        <!--     </button> -->
+        <!--     {mockCategories.map((category) => ( -->
+        <!--       <button  -->
+        <!--       class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors" -->
+        <!--       data-category={category} -->
+        <!--       > -->
+        <!--         {category} -->
+        <!--       </button> -->
+        <!--     ))} -->
+        <!--   </div> -->
+        <!-- </div> -->
         <!-- layouts Toggle -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div class="text-sm text-gray-600">
@@ -145,6 +144,7 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
             <button 
               class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors ${defaultLayout === 'table' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
               data-layouts="table"
+              data-desktop-only="true"
             >
               Table
             </button>

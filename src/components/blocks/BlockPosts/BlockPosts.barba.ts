@@ -29,6 +29,9 @@ export default function registerBlockPostsHooks() {
       if (isBlogOrProjectsPage) {
         initializePostsInteractivity();
       }
+      
+      // Always initialize responsive layouts
+      initializeResponsiveLayouts();
     }, 1000); // Wait for overlay collapse
   });
 }
@@ -43,6 +46,60 @@ function initializeOnLoad() {
       initializePostsInteractivity();
     }, 100);
   }
+  
+  // Always initialize responsive layouts
+  setTimeout(() => {
+    initializeResponsiveLayouts();
+  }, 100);
+}
+
+function initializeResponsiveLayouts() {
+  // GSAP matchMedia for responsive layout handling
+  const mm = gsap.matchMedia();
+  
+  // Mobile and tablet: Only show mason and parallax, hide table
+  mm.add('(max-width: 1023px)', () => {
+    const tableButton = document.querySelector('[data-layouts="table"]');
+    const postsTable = document.getElementById('posts-table');
+    
+    // Hide table button on mobile/tablet
+    if (tableButton) {
+      gsap.set(tableButton, { display: 'none' });
+    }
+    
+    // Hide table content on mobile/tablet
+    if (postsTable) {
+      gsap.set(postsTable, { display: 'none' });
+    }
+    
+    // If current layout is table, switch to mason
+    const postsBlock = document.querySelector('#posts-block');
+    const currentLayout = postsBlock?.getAttribute('data-initial-layout');
+    if (currentLayout === 'table') {
+      const postsContainer = document.getElementById('posts-container');
+      if (postsContainer) {
+        gsap.set(postsContainer, { display: 'block' });
+      }
+    }
+  });
+  
+  // Desktop: Show all layouts including table
+  mm.add('(min-width: 1024px)', () => {
+    const tableButton = document.querySelector('[data-layouts="table"]');
+    const postsTable = document.getElementById('posts-table');
+    
+    // Show table button on desktop
+    if (tableButton) {
+      gsap.set(tableButton, { display: 'block' });
+    }
+    
+    // Show table content on desktop (if it was the selected layout)
+    const postsBlock = document.querySelector('#posts-block');
+    const currentLayout = postsBlock?.getAttribute('data-initial-layout');
+    if (currentLayout === 'table' && postsTable) {
+      gsap.set(postsTable, { display: 'block' });
+    }
+  });
 }
 
 function initializePostsInteractivity() {
@@ -56,7 +113,7 @@ function initializePostsInteractivity() {
   const postsContainer = document.getElementById('posts-container');
   const postsTable = document.getElementById('posts-table');
   const postCount = document.getElementById('post-count');
-  const isDesktop = () => window.matchMedia('(min-width: 768px)').matches;
+  const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
   
   let currentCategory = 'all';
   let currentLayout = 'mason';
@@ -104,7 +161,7 @@ function initializePostsInteractivity() {
   // Simple layout switcher
   function switchLayout(layout: string) {
     if (!isDesktop()) {
-      // Force mason on mobile
+      // Force mason on mobile/tablet
       postsTable?.classList.add('hidden', 'md:hidden');
       postsTable?.classList.remove('md:block');
       postsContainer?.classList.remove('hidden');
@@ -181,9 +238,13 @@ function initializePostsInteractivity() {
     
     // Create handler function
     button._layoutClickHandler = (e: Event) => {
-      if (!isDesktop()) return;
       const target = e.target as HTMLElement;
       const layout = target.dataset.layouts || 'mason';
+      
+      // Check if this is a desktop-only layout on mobile
+      if (!isDesktop() && target.hasAttribute('data-desktop-only')) {
+        return;
+      }
 
       // Update active state
       layoutButtons.forEach(btn => {
@@ -218,11 +279,21 @@ function initializePostsInteractivity() {
       document.getElementById('posts-parallax')?.classList.add('hidden');
       document.getElementById('posts-carousel')?.classList.add('hidden');
     } else if (initialLayout === 'table') {
-      postsTable?.classList.remove('hidden', 'md:hidden');
-      postsTable?.classList.add('md:block');
-      postsContainer?.classList.add('hidden');
-      document.getElementById('posts-parallax')?.classList.add('hidden');
-      document.getElementById('posts-carousel')?.classList.add('hidden');
+      // Only show table on desktop
+      if (isDesktop()) {
+        postsTable?.classList.remove('hidden', 'md:hidden');
+        postsTable?.classList.add('md:block');
+        postsContainer?.classList.add('hidden');
+        document.getElementById('posts-parallax')?.classList.add('hidden');
+        document.getElementById('posts-carousel')?.classList.add('hidden');
+      } else {
+        // Fallback to mason on mobile/tablet
+        postsContainer?.classList.remove('hidden');
+        postsTable?.classList.add('hidden', 'md:hidden');
+        document.getElementById('posts-parallax')?.classList.add('hidden');
+        document.getElementById('posts-carousel')?.classList.add('hidden');
+        currentLayout = 'mason';
+      }
     } else if (initialLayout === 'parallax') {
       document.getElementById('posts-parallax')?.classList.remove('hidden');
       postsContainer?.classList.add('hidden');
@@ -237,7 +308,7 @@ function initializePostsInteractivity() {
     
     // Run initial animation
     setTimeout(() => {
-      switchLayout(initialLayout);
+      switchLayout(currentLayout);
     }, 100);
   }
   
@@ -245,7 +316,7 @@ function initializePostsInteractivity() {
   if (layoutButtons.length > 0) {
     layoutButtons.forEach(btn => {
       const btnLayout = btn.getAttribute('data-layouts');
-      if (btnLayout === initialLayout) {
+      if (btnLayout === currentLayout) {
         btn.classList.add('active', 'bg-white', 'text-gray-900', 'shadow-sm');
         btn.classList.remove('text-gray-600');
       }
@@ -275,7 +346,7 @@ function initializePostsInteractivity() {
     );
   }
 
-  function animateTable() {
+  function animateTableRows() {
     const rows = document.querySelectorAll('#posts-table-wrap .post-row');
     if (!rows.length) return;
     
@@ -286,7 +357,9 @@ function initializePostsInteractivity() {
     
     // Initialize table preview after animation
     setTimeout(() => {
-      initializeTablePreview();
+      if ((window as any).initializeTablePreview) {
+        (window as any).initializeTablePreview();
+      }
     }, 200);
   }
 
@@ -325,16 +398,5 @@ function initializePostsInteractivity() {
     ]);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 registerBlockPostsHooks();

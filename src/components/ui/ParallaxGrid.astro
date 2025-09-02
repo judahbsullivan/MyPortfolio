@@ -25,21 +25,26 @@ const { posts, class: className, base = 'post' } = Astro.props as Props;
       <!-- Image Container -->
       <div class="parallax-container relative w-full max-w-4xl mx-auto aspect-video overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl mb-4">
         {post.image && (
-          <div class="parallax-image-wrapper absolute inset-0 w-full h-full">
+          <div class="parallax-image-wrapper  absolute inset-0 w-full h-full">
             {post.image.startsWith('http') ? (
               <img
                 src={post.image}
                 alt={post.title || 'Post image'}
-                class="parallax-image w-[120%] md:w-[133%] h-[120%] md:h-[133%] object-cover"
+                class="parallax-image w-[102%] md:w-[105%] h-[102%] md:h-[105%] object-cover"
                 loading="lazy"
               />
             ) : (
               <DirectusImage
                 imageId={post.image}
                 alt={post.title || 'Post image'}
-                class="parallax-image w-[120%] md:w-[133%] h-[120%] object-cover"
+                class="parallax-image aspect-video object-center w-[102%] md:w-[105%] h-[102%] object-cover"
               />
             )}
+            
+            <!-- Clickable Overlay -->
+            <Link href={`/${base}/${post.slug}`} class="clickable-overlay absolute inset-0 z-10 block">
+              <span class="sr-only">View {post.title}</span>
+            </Link>
           </div>
         )}
         
@@ -92,5 +97,22 @@ const { posts, class: className, base = 'post' } = Astro.props as Props;
   .clickable-overlay:active .parallax-image {
     transform: scale(1.02);
     transition: transform 0.1s ease-out;
+  }
+  
+  /* Ensure smooth parallax effect */
+  .parallax-image {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+  }
+  
+  .parallax-container {
+    overflow: hidden;
+    transform: translateZ(0);
+  }
+  
+  .parallax-image-wrapper {
+    overflow: hidden;
+    border-radius: inherit;
   }
 </style>

@@ -42,7 +42,7 @@ export function initializeParallaxLayout() {
 
     // Set initial state - container starts as mask, image starts scaled up
     gsap.set(imageContainer, { clipPath: "inset(100% 0% 0% 0%)" });
-    gsap.set(image, { scale: 1.5, y: 0 });
+    gsap.set(image, { scale: 1.2, y: 20 }); // Start image slightly lower (y: 20) so it can center
     gsap.set(content, { opacity: 0 });
 
     // Container mask reveals from top to bottom using clipPath (doesn't affect image scaling)
@@ -65,10 +65,10 @@ export function initializeParallaxLayout() {
       },
     );
 
-    // Image scales down from 1.5 to 1 (INDEPENDENT of container scaling)
+    // Image scales down from 1.2 to 1 (INDEPENDENT of container scaling)
     gsap.fromTo(
       image,
-      { scale: 1.5 },
+      { scale: 1.2 },
       {
         scale: 1,
         duration: 1.0,
@@ -92,7 +92,7 @@ export function initializeParallaxLayout() {
 
     // Container acts as mask - image slides through it after reveal
     gsap.to(image, {
-      y: -100, // Image slides up through the container mask
+      y: -15, // Very subtle movement from y: 20 to y: -15 (total 35px movement)
       ease: "none",
       scrollTrigger: {
         id: `parallax-effect-${index}`,
