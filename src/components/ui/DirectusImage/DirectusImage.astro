@@ -32,7 +32,6 @@ const {
 // Safely resolve image ID
 const imageId = rawId ?? image?.id;
 if (!imageId) {
-  console.warn("❌ No image or imageId provided to DirectusImage");
   return null;
 }
 
@@ -51,7 +50,6 @@ if (width === undefined || height === undefined) {
 
 // Final sanity check
 if (typeof width !== "number" || typeof height !== "number") {
-  console.warn("⚠️ DirectusImage missing valid width/height.");
   return null;
 }
 

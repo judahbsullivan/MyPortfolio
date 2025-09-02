@@ -17,7 +17,7 @@ function initSmoother() {
     smooth: 1.2,
     effects: true,
   });
-  console.log("[initAnimations] ScrollSmoother initialized");
+
 }
 
 // Expose these so layout.barba.ts can kill/re-init
@@ -46,11 +46,11 @@ if (typeof window !== "undefined") {
       const fn = (modules[path] as any).default;
       if (typeof fn === "function") {
         fn();
-        console.log(`[initAnimations] Registered hooks from ${path}`);
+
       }
     }
 
-    console.log("[initAnimations] Barba hooks loaded");
+
     (window as any).__initAnimations_initialized = true;
   }
 }

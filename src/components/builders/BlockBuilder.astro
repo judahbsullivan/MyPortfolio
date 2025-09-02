@@ -32,13 +32,11 @@ const blockMap: Record<string, () => Promise<{ default: any }>> = {
 { blocks?.map(async (block, index) => {
   const collection = block.collection;
   if (!collection || typeof collection !== 'string') {
-    console.warn('❌ Block missing or invalid collection:', block);
     return null;
   }
 
 const loader = blockMap[collection];
   if (!loader) {
-    console.warn(`⚠️ No component found for block type "${collection}"`);
     return null;
   }
 
@@ -51,8 +49,8 @@ const loader = blockMap[collection];
   key={index}  
   user_created={user_created}
 />
-    )} catch (err) {
-    console.error(`❌ Error loading block "${collection}":`, err);
+    );
+  } catch (err) {
     return null;
   }
 })}

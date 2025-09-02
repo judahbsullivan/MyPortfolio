@@ -10,14 +10,12 @@ export default function registerCarouselGridHooks() {
 
   barba.hooks.afterEnter(() => {
     setTimeout(() => {
-      console.log('CarouselGrid: afterEnter hook triggered');
       initializeCarouselLayout();
     }, 1000); // Wait for overlay collapse
   });
 }
 
 export function initializeCarouselLayout() {
-  console.log('Initializing CarouselGrid animations...');
 
   // Kill any existing ScrollTriggers for this component to prevent conflicts
   ScrollTrigger.getAll().forEach(trigger => {
@@ -32,16 +30,12 @@ export function initializeCarouselLayout() {
   }
 
   const carouselItems = document.querySelectorAll('.carousel-container');
-  console.log('Found carousel items:', carouselItems.length);
 
   carouselItems.forEach((item, index) => {
     const image = item.querySelector('.carousel-image');
     const content = item.querySelector('.absolute.inset-0.bg-black\\/60');
 
-    console.log(`Item ${index}:`, { image, content });
-
     if (!image || !content) {
-      console.log(`Item ${index}: Missing elements, skipping`);
       return;
     }
 
@@ -64,7 +58,6 @@ export function initializeCarouselLayout() {
           end: 'right 20%',
           scrub: false,
           onEnter: () => {
-            console.log(`Carousel container ${index} mask revealing from left`);
           }
         }
       }
@@ -85,7 +78,6 @@ export function initializeCarouselLayout() {
           scrub: false,
           delay: 0.2, // Start after container starts revealing
           onEnter: () => {
-            console.log(`Carousel image ${index} scaling down from 1.2 to 1`);
             // After image scales down, start content animations
             setTimeout(() => {
               gsap.to(content, { opacity: 1, duration: 0.5 });

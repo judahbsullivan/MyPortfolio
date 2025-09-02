@@ -55,6 +55,8 @@ const normalized = items.map((item) => {
   }
 });
 
+
+
 const basePath = (collection === 'projects' || collection === 'project') ? '/projects' : '/blog';
 const label = (collection === 'projects' || collection === 'project') ? 'Project' : 'Post';
 ---
@@ -80,7 +82,7 @@ const label = (collection === 'projects' || collection === 'project') ? 'Project
   {layouts === 'mason' && <MasonGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
   {layouts === 'parallax' && <ParallaxGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
   {layouts === 'carousel' && <CarouselGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
-  {layouts === 'list' && <Table posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
+  {(layouts === 'list' || layouts === 'view') && <Table posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
 
   <!-- View All Button -->
   <div class="mt-12">

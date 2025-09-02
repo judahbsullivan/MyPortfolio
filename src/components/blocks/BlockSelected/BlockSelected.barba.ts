@@ -9,7 +9,7 @@ export default function registerBlockDescriptionHooks(): void {
   if (typeof window === "undefined") return;
 
   barba.hooks.afterEnter(({ next }: any) => {
-        console.log('BlockSelected is Ready for Animation')
+      
     
   });
 }

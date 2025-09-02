@@ -11,9 +11,9 @@ const {
   description,
   cover_image,
   content,
-  published_At
+ date_created 
 } = props;
-console.log(cover_image)
+
 ---
 
 <Section 
@@ -22,7 +22,7 @@ console.log(cover_image)
   <!-- Header -->
   <div class="space-y-4 max-w-4xl">
     <p class="text-sm text-gray-500 uppercase tracking-widest">
-      {published_At && new Date(published_At).toLocaleDateString()}
+      {date_created && new Date(date_created).toLocaleDateString()}
     </p>
   
    <h1 class="tracking-tighter text-[10vw] inline-block text-pretty break-keep leading-[.99] uppercase text-center">

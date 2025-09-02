@@ -37,7 +37,7 @@ const { posts, class: className, base = 'post' } = Astro.props as Props;
               <DirectusImage
                 imageId={post.image}
                 alt={post.title || 'Post image'}
-                class="parallax-image w-[120%] md:w-[133%] h-[120%] md:w-[133%] object-cover"
+                class="parallax-image w-[120%] md:w-[133%] h-[120%] object-cover"
               />
             )}
           </div>
@@ -47,11 +47,6 @@ const { posts, class: className, base = 'post' } = Astro.props as Props;
         <div class="hover-bubble absolute w-fit h-12 flex items-center justify-center bg-black/90 text-white px-4 py-2 md:px-6 md:py-3 rounded-full text-sm md:text-base font-medium opacity-0 pointer-events-none z-10 shadow-lg">
           Read this {base === 'project' ? 'Project' : 'Post'}
         </div>
-        
-        <!-- Clickable Overlay -->
-        <Link href={`/${base}/${post.slug}`} class="clickable-overlay absolute inset-0 z-5 cursor-pointer group">
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 ease-out"></div>
-        </Link>
       </div>
       
       <!-- Content Below Image -->

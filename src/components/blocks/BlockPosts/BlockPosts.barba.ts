@@ -47,7 +47,6 @@ function initializePostsInteractivity() {
     if (!currentLayout) return [];
     
     const postElements = currentLayout.querySelectorAll('[href*="/post/"], [href*="/project/"]');
-    console.log('Found post elements in current layout:', postElements.length);
     return Array.from(postElements).map(element => {
       const link = element as HTMLElement;
       const title = link.querySelector('h3')?.textContent || '';
@@ -66,7 +65,6 @@ function initializePostsInteractivity() {
     // Update post count
     if (postCount) {
       postCount.textContent = filteredPosts.length.toString();
-      console.log('Updated post count to:', filteredPosts.length);
     }
 
     // Show all posts
@@ -95,11 +93,8 @@ function initializePostsInteractivity() {
 
     // Prevent switching to the same layout
     if (layout === currentLayout) {
-      console.log(`Already on layout: ${layout}, ignoring switch`);
       return;
     }
-
-    console.log(`Switching from ${currentLayout} to ${layout}`);
 
     // Clean up existing animations
     cleanupAnimations();
@@ -167,8 +162,6 @@ function initializePostsInteractivity() {
       const target = e.target as HTMLElement;
       const layout = target.dataset.layouts || 'mason';
 
-      console.log(`Layout button clicked: ${layout}`);
-
       // Update active state
       layoutButtons.forEach(btn => {
         btn.classList.remove('active', 'bg-white', 'text-gray-900', 'shadow-sm');
@@ -187,7 +180,7 @@ function initializePostsInteractivity() {
 
   // Set initial layout based on the component prop
   const initialLayout = el.getAttribute('data-initial-layout') || 'mason';
-  console.log('Setting initial layout to:', initialLayout);
+
   
   // Set initial layout
   currentLayout = initialLayout;
@@ -305,7 +298,7 @@ function initializePostsInteractivity() {
       '.break-inside-avoid'
     ]);
     
-    console.log('Animations cleaned up');
+  
   }
 }
 
@@ -334,11 +327,8 @@ function animateTableRows() {
   
   // Prevent double animation
   if ((window as any)._tableRowsAnimated) {
-    console.log('Table rows already animated, skipping');
     return;
   }
-  
-  console.log('Animating table rows...');
   (window as any)._tableRowsAnimated = true;
   
   gsap.fromTo(
@@ -351,7 +341,6 @@ function animateTableRows() {
       ease: 'power2.out',
       stagger: 0.03,
       onComplete: () => {
-        console.log('Table row animation complete');
       }
     }
   );
@@ -364,22 +353,17 @@ function initializeTablePreview() {
   const frame = document.getElementById('post-preview-frame');
 
   if (!tableWrap || !preview || !slider || !frame) {
-    console.log('Table preview elements not found');
     return;
   }
 
   // Prevent double initialization
   if ((window as any)._tablePreviewInitialized) {
-    console.log('Table preview already initialized, skipping');
     return;
   }
-
-  console.log('Initializing table preview...');
   (window as any)._tablePreviewInitialized = true;
 
   // Remove existing event listeners to prevent conflicts
   if ((tableWrap as any)._previewBound) {
-    console.log('Removing existing table preview bindings...');
     // Remove old event listeners if they exist
     const oldRows = tableWrap.querySelectorAll('.post-row');
     oldRows.forEach(row => {

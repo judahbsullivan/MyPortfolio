@@ -14,9 +14,7 @@ const { headline, tagline, limit, collection, layouts } = props;
 const currentPath = Astro.url?.pathname || '/';
 const isBlogOrProjectsPage = currentPath === '/blog' || currentPath === '/projects';
 
-console.log('BlockPosts props:', { headline, tagline, limit, collection, layouts, isBlogOrProjectsPage });
-console.log('Layouts prop value:', layouts);
-console.log('Layouts prop type:', typeof layouts);
+
 
 // Simple data structure for reusable block
 type CardItem = { slug?: string | null; title?: string | null; description?: string | null; image?: string | null; published_at?: string | null };
@@ -27,11 +25,8 @@ if (collection) {
   try {
     const resolvedLimit = typeof limit === 'number' && Number.isFinite(limit) && limit > 0 ? limit : undefined;
     items = await getItems<any>(collection, resolvedLimit as any);
-    console.log('BlockPosts: Fetched items from collection:', collection, items);
-    
     // Add fallback data if no items returned
     if (!items || items.length === 0) {
-      console.log('BlockPosts: No items returned from collection, using fallback data');
       items = [
         {
           slug: 'fallback-post-1',
@@ -50,11 +45,9 @@ if (collection) {
       ];
     }
   } catch (err) {
-    console.error('Failed to load items for BlockPosts:', err);
     items = [];
   }
 } else {
-  console.log('BlockPosts: No collection specified, no data will be fetched');
   // Add fallback data for testing
   items = [
     {
@@ -69,7 +62,6 @@ if (collection) {
 
 // Normalize to common shape for grid/table
 const base = collection === 'projects' ? 'project' : 'post';
-console.log('BlockPosts: Base path set to:', base, 'for collection:', collection);
 const normalized: CardItem[] = (items || []).map((it: any) => ({
   slug: it?.slug ?? null,
   title: it?.title ?? null,
@@ -78,8 +70,7 @@ const normalized: CardItem[] = (items || []).map((it: any) => ({
   published_at: (base === 'project' ? it?.date_created : it?.published_at) ?? null,
 }));
 
-console.log('BlockPosts normalized items:', normalized);
-console.log('BlockPosts items count:', normalized?.length || 0);
+
 
 // For now, let's create some mock categories since Posts doesn't have tags
 // In a real implementation, you'd need to add a tags field to your Posts collection
@@ -221,12 +212,8 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
       // Get initial layout from CMS prop
       const postsBlock = document.querySelector('#posts-block');
       const initialLayout = postsBlock?.getAttribute('data-initial-layout') || 'mason';
-      console.log('Posts block element:', postsBlock);
-      console.log('Data initial layout attribute:', postsBlock?.getAttribute('data-initial-layout'));
-      console.log('Initial layout from CMS:', initialLayout);
       
       // Set initial layout for ALL pages first
-      console.log('Setting initial layout to:', initialLayout);
       if (postsContainer) postsContainer.style.display = initialLayout === 'mason' ? 'block' : 'none';
       if (postsTable) postsTable.style.display = initialLayout === 'table' ? 'block' : 'none';
       if (postsParallax) postsParallax.style.display = initialLayout === 'parallax' ? 'block' : 'none';
@@ -234,11 +221,9 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
       
       // Check if we're on blog/projects page (has layout buttons)
       const isBlogOrProjectsPage = layoutButtons.length > 0;
-      console.log('Is blog/projects page:', isBlogOrProjectsPage);
       
       if (isBlogOrProjectsPage) {
         // Blog/Projects pages: Start with CMS layout, allow switching
-        console.log('Blog/Projects page: Starting with CMS layout, allowing switching');
         
         // Layout button event listeners
         layoutButtons.forEach(button => {
@@ -264,23 +249,17 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
             setTimeout(() => {
               if (layout === 'table') {
                 // Re-initialize table animations
-                console.log('Re-initializing table animations');
                 animateTableRows();
                 initializeTablePreview();
               } else if (layout === 'parallax') {
                 // Re-initialize parallax animations
-                console.log('Re-initializing parallax animations');
                 initializeParallaxLayout();
               } else if (layout === 'carousel') {
                 // Re-initialize carousel animations (if needed)
-                console.log('Carousel layout selected');
               } else if (layout === 'mason') {
                 // Re-initialize masonry animations (if needed)
-                console.log('Mason layout selected');
               }
             }, 100);
-            
-            console.log('Switched to layout:', layout);
           });
         });
         
@@ -292,7 +271,6 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
         }
       } else {
         // Other pages: Use only the CMS layout, no switching
-        console.log('Other page: Using only CMS layout, no switching');
         // Layout is already set above for all pages
       }
     });

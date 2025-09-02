@@ -6,7 +6,6 @@ function LayoutEnter(container: HTMLElement): void {
   // const footer = document.querySelector<HTMLElement>("footer");
 
   if (!overlay) {
-    console.error("Overlay element not found!");
     return;
   }
 
@@ -33,7 +32,6 @@ function LayoutExit(container: HTMLElement): Promise<void> {
   const footer = document.querySelector<HTMLElement>("footer");
 
   if (!overlay) {
-    console.error("Overlay element not found!");
     return Promise.resolve();
   }
 
@@ -63,19 +61,14 @@ export default function registerLayoutBarba() {
         name: "overlay-transition",
 
         async leave({ current }) {
-          console.log("[layout.barba] leave → LayoutExit (overlay scaling up)");
           return LayoutExit(current.container);
         },
 
         async enter({ next }) {
-          console.log(
-            "[layout.barba] enter → LayoutEnter (overlay scaling down)",
-          );
           LayoutEnter(next.container);
         },
 
         async afterEnter({ next }) {
-          console.log("[layout.barba] afterEnter → unblocked container");
           // Always reset scroll to top after transitions (use instant on mobile)
           const isMobile = window.matchMedia('(max-width: 767px)').matches;
           window.scrollTo({ top: 0, left: 0, behavior: isMobile ? 'auto' : 'auto' });
@@ -89,7 +82,7 @@ export default function registerLayoutBarba() {
     ],
   });
 
-  console.log("[layout.barba] initialized overlay transition");
+
   (window as any).__layout_barba_initialized = true;
 }
 

@@ -10,14 +10,12 @@ export default function registerParallaxGridHooks() {
 
   barba.hooks.afterEnter(() => {
     setTimeout(() => {
-      console.log("ParallaxGrid: afterEnter hook triggered");
       initializeParallaxLayout();
     }, 1000); // Wait for overlay collapse
   });
 }
 
 export function initializeParallaxLayout() {
-  console.log("Initializing ParallaxGrid animations...");
 
   // Kill any existing ScrollTriggers for this component to prevent conflicts
   ScrollTrigger.getAll().forEach((trigger) => {
@@ -32,17 +30,13 @@ export function initializeParallaxLayout() {
   }
 
   const parallaxItems = document.querySelectorAll(".parallax-item");
-  console.log("Found parallax items:", parallaxItems.length);
 
   parallaxItems.forEach((item, index) => {
     const imageContainer = item.querySelector(".parallax-container");
     const content = item.querySelector(".parallax-content");
     const image = item.querySelector(".parallax-image");
 
-    console.log(`Item ${index}:`, { imageContainer, content, image });
-
     if (!imageContainer || !content || !image) {
-      console.log(`Item ${index}: Missing elements, skipping`);
       return;
     }
 
@@ -66,7 +60,6 @@ export function initializeParallaxLayout() {
           end: "bottom 30%",
           scrub: false,
           onEnter: () => {
-            console.log(`Container ${index} mask revealing from top`);
           },
         },
       },
@@ -88,7 +81,6 @@ export function initializeParallaxLayout() {
           scrub: false,
           delay: 0.3, // Start after container starts revealing
           onEnter: () => {
-            console.log(`Image ${index} scaling down from 1.5 to 1`);
             // After image scales down, start content animations
             setTimeout(() => {
               gsap.to(content, { opacity: 1, duration: 0.5 });
@@ -205,14 +197,12 @@ export function initializeParallaxLayout() {
 
   // Enhanced hover bubble animation with smoother transitions
   const imageContainers = document.querySelectorAll(".parallax-container");
-  console.log("Found image containers for hover:", imageContainers.length);
 
   imageContainers.forEach((container, index) => {
     const bubble = container.querySelector(".hover-bubble");
     const clickableOverlay = container.querySelector(".clickable-overlay");
     
     if (!bubble) {
-      console.log(`Container ${index}: No bubble found`);
       return;
     }
 

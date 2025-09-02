@@ -45,8 +45,6 @@ export async function getItems<T>(
 
     return items as T[];
   } catch (error) {
-    console.error(`Error fetching items from ${collection}:`, error);
-
     // If authentication fails, try without auth (for public collections)
     try {
       const items = await directusClient.request(
@@ -54,7 +52,6 @@ export async function getItems<T>(
       );
       return items as T[];
     } catch (fallbackError) {
-      console.error(`Fallback fetch failed for ${collection}:`, fallbackError);
       return [];
     }
   }

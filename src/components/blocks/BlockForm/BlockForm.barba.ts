@@ -21,7 +21,7 @@ export default function registerBlockFormHooks() {
     // Grab values (optional logging)
     const formData = new FormData(form);
     const values = Object.fromEntries(formData.entries());
-    console.log("🧾 Form values:", values);
+    
 
     // Disable the submit button
     const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
