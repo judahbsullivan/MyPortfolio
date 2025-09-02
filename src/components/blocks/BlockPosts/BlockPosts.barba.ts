@@ -136,7 +136,7 @@ function initializePostsInteractivity() {
     } else if (layout === 'table') {
       postsTable?.classList.remove('hidden', 'md:hidden');
       postsTable?.classList.add('md:block');
-      animateTable();
+      animateTableRows();
     } else if (layout === 'parallax') {
       document.getElementById('posts-parallax')?.classList.remove('hidden');
       animateParallax();
@@ -262,6 +262,8 @@ function initializePostsInteractivity() {
   // Initialize with current category after layout is set
   filterPosts(currentCategory);
 
+
+
   // Simple animation functions
   function animateMasonry() {
     const cards = document.querySelectorAll('.mason-grid .break-inside-avoid');
@@ -324,240 +326,14 @@ function initializePostsInteractivity() {
   }
 }
 
-function animateMasonryCards() {
-  const cards = document.querySelectorAll(
-    '.mason-grid .break-inside-avoid'
-  );
-  if (!cards.length) return;
-
-  gsap.fromTo(
-    cards,
-    { y: 20, opacity: 0 },
-    {
-      y: 0,
-      opacity: 1,
-      duration: 0.5,
-      ease: 'power2.out',
-      stagger: 0.05,
-    }
-  );
-}
-
-function animateTableRows() {
-  const rows = document.querySelectorAll('#posts-table-wrap .post-row');
-  if (!rows.length) return;
-  
-  // Prevent double animation
-  if ((window as any)._tableRowsAnimated) {
-    return;
-  }
-  (window as any)._tableRowsAnimated = true;
-  
-  gsap.fromTo(
-    rows,
-    { y: 10, opacity: 0 },
-    {
-      y: 0,
-      opacity: 1,
-      duration: 0.35,
-      ease: 'power2.out',
-      stagger: 0.03,
-      onComplete: () => {
-      }
-    }
-  );
-}
 
 
-  (tableWrap as any)._previewBound = true;
 
-  const rows = tableWrap.querySelectorAll('.post-row');
-  let activeIndex = 0;
 
-  const showPreview = () => {
-    preview.classList.remove('scale-0', 'opacity-0');
-    preview.classList.add('scale-100', 'opacity-100');
-  };
-  const hidePreview = () => {
-    preview.classList.add('scale-0', 'opacity-0');
-    preview.classList.remove('scale-100', 'opacity-100');
-  };
-  const updateIndex = (index: number) => {
-    const h = (frame as HTMLElement).clientHeight;
-    const countAttr = slider.getAttribute('data-count');
-    const count = Number(countAttr) || 0;
-    const reversedIndex = Math.max(0, count - 1 - index);
-    const offset = -(reversedIndex * h);
-    (slider as HTMLElement).style.transform = `translateY(${offset}px)`;
-  };
 
-  rows.forEach((row) => {
-    const mouseenterHandler = (e: Event) => {
-      const target = e.currentTarget as HTMLElement | null;
-      if (!target) return;
-      const indexAttr = target.getAttribute('data-index');
-      const idx = Number(indexAttr) || 0;
-      activeIndex = idx;
-      updateIndex(activeIndex);
-      showPreview();
-    };
-    
-    // Store reference for removal
-    (row as any)._mouseenterHandler = mouseenterHandler;
-    row.addEventListener('mouseenter', mouseenterHandler);
-  });
 
-  const mouseenterHandler = () => {
-    updateIndex(activeIndex);
-    showPreview();
-  };
-  const mouseleaveHandler = () => hidePreview();
-  const mousemoveHandler = (e: MouseEvent) => {
-    const rect = tableWrap.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const offsetX = 24;
-    const offsetY = -20;
-    (preview as HTMLElement).style.left = `${x + offsetX}px`;
-    (preview as HTMLElement).style.top = `${y + offsetY}px`;
-  };
 
-  // Store references for removal
-  (tableWrap as any)._mouseenterHandler = mouseenterHandler;
-  (tableWrap as any)._mouseleaveHandler = mouseleaveHandler;
-  (tableWrap as any)._mousemoveHandler = mousemoveHandler;
 
-  tableWrap.addEventListener('mouseenter', mouseenterHandler);
-  tableWrap.addEventListener('mouseleave', mouseleaveHandler);
-  tableWrap.addEventListener('mousemove', mousemoveHandler);
-}
-
-function initializeParallaxLayout() {
-  const parallaxItems = document.querySelectorAll('.parallax-item');
-  const parallaxImages = document.querySelectorAll('.parallax-image-container');
-  
-  // Set initial positions
-  gsap.set(parallaxImages, { x: '100%' });
-  
-  // Create scroll-triggered animations
-  parallaxItems.forEach((item, index) => {
-    const imageContainer = item.querySelector('.parallax-image-container');
-    const content = item.querySelector('.parallax-content');
-    
-    if (!imageContainer || !content) return;
-    
-    // Image parallax animation
-    gsap.to(imageContainer, {
-      x: '0%',
-      duration: 1,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: item,
-        start: 'top center',
-        end: 'bottom center',
-        scrub: 1
-      }
-    });
-    
-    // Content reveal animation
-    const split = new SplitText(content, {
-      type: 'chars, words, lines',
-      linesClass: 'line',
-      wordsClass: 'word',
-      charsClass: 'char',
-      mask: 'lines'
-    });
-    
-    gsap.set(split.chars, { yPercent: 100, opacity: 0 });
-    
-    gsap.to(split.chars, {
-      yPercent: 0,
-      opacity: 1,
-      duration: 0.8,
-      stagger: 0.03,
-      ease: 'power4.out',
-      scrollTrigger: {
-        trigger: item,
-        start: 'center center',
-        end: 'bottom center',
-        scrub: false
-      }
-    });
-  });
-  
-  // Hover bubble animation
-  parallaxImages.forEach(container => {
-    const bubble = container.querySelector('.hover-bubble');
-    if (!bubble) return;
-    
-    container.addEventListener('mousemove', (e) => {
-      const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      gsap.to(bubble, {
-        x: x - 50,
-        y: y - 20,
-        duration: 0.1,
-        ease: 'power2.out'
-      });
-    });
-  });
-}
-
-function initializeCarouselLayout() {
-  const carouselTrack = document.querySelector('.carousel-track');
-  const carouselItems = document.querySelectorAll('.carousel-item');
-  
-  if (!carouselTrack || !carouselItems.length) return;
-  
-  let currentIndex = 0;
-  const itemWidth = 100 / carouselItems.length;
-  let autoScrollInterval: NodeJS.Timeout;
-  
-  // Auto-scroll carousel
-  function autoScroll() {
-    currentIndex = (currentIndex + 1) % carouselItems.length;
-    const translateX = -currentIndex * itemWidth;
-    
-    gsap.to(carouselTrack, {
-      x: `${translateX}%`,
-      duration: 2,
-      ease: 'power2.inOut'
-    });
-  }
-  
-  function startAutoScroll() {
-    autoScrollInterval = setInterval(autoScroll, 3000);
-  }
-  
-  function stopAutoScroll() {
-    if (autoScrollInterval) {
-      clearInterval(autoScrollInterval);
-    }
-  }
-  
-  // Start auto-scroll
-  startAutoScroll();
-  
-  // Pause on hover
-  carouselTrack.addEventListener('mouseenter', stopAutoScroll);
-  carouselTrack.addEventListener('mouseleave', startAutoScroll);
-  
-  // Manual navigation
-  carouselItems.forEach((item, index) => {
-    item.addEventListener('click', () => {
-      currentIndex = index;
-      const translateX = -currentIndex * itemWidth;
-      
-      gsap.to(carouselTrack, {
-        x: `${translateX}%`,
-        duration: 0.5,
-        ease: 'power2.out'
-      });
-    });
-  });
-}
 
 
 
