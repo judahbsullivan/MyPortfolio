@@ -44,9 +44,14 @@ const { posts, class: className, base = 'post' } = Astro.props as Props;
         )}
         
         <!-- Hover Bubble -->
-        <div class="hover-bubble absolute bg-white/90 text-black px-2 py-1 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-medium opacity-0 pointer-events-none z-10">
+        <div class="hover-bubble absolute w-fit h-12 flex items-center justify-center bg-black/90 text-white px-4 py-2 md:px-6 md:py-3 rounded-full text-sm md:text-base font-medium opacity-0 pointer-events-none z-10 shadow-lg">
           Read this {base === 'project' ? 'Project' : 'Post'}
         </div>
+        
+        <!-- Clickable Overlay -->
+        <Link href={`/${base}/${post.slug}`} class="clickable-overlay absolute inset-0 z-5 cursor-pointer group">
+          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 ease-out"></div>
+        </Link>
       </div>
       
       <!-- Content Below Image -->
@@ -71,3 +76,26 @@ const { posts, class: className, base = 'post' } = Astro.props as Props;
   import registerParallaxGridHooks from './ParallaxGrid.barba.ts';
   registerParallaxGridHooks();
 </script>
+
+<style>
+  @keyframes ripple {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+  
+  .ripple-effect {
+    animation: ripple 0.6s linear;
+  }
+  
+  .clickable-overlay:hover .parallax-image {
+    transform: scale(1.05);
+    transition: transform 0.3s ease-out;
+  }
+  
+  .clickable-overlay:active .parallax-image {
+    transform: scale(1.02);
+    transition: transform 0.1s ease-out;
+  }
+</style>

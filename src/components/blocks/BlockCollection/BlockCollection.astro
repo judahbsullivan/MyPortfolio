@@ -19,20 +19,12 @@ import { getArticles } from '@/directus/queries/articles';
 const props = Astro.props as BlockCollection;
 const { tagline, headline, limit, collection, layouts } = props;
 
-// Debug logging
-console.log('BlockCollection props:', { tagline, headline, limit, collection, layouts });
-console.log('Collection type:', typeof collection, 'Value:', collection);
-
 // Use appropriate query function based on collection type
 let items: any[];
-if (collection === 'projects') {
-  console.log('Fetching projects...');
+if (collection === 'projects' || collection === 'project') {
   items = await getProject() as Projects[];
-  console.log('Projects fetched:', items);
 } else {
-  console.log('Fetching posts...');
   items = await getArticles() as Posts[];
-  console.log('Posts fetched:', items);
 }
 
 // Apply limit if specified
@@ -42,7 +34,7 @@ if (limit && Number(limit) > 0) {
 
 // Normalize items to have consistent structure based on collection type
 const normalized = items.map((item) => {
-  if (collection === 'projects') {
+  if (collection === 'projects' || collection === 'project') {
     // Projects structure
     return {
       slug: item.slug,
@@ -63,8 +55,8 @@ const normalized = items.map((item) => {
   }
 });
 
-const basePath = collection === 'projects' ? '/projects' : '/blog';
-const label = collection === 'projects' ? 'Project' : 'Post';
+const basePath = (collection === 'projects' || collection === 'project') ? '/projects' : '/blog';
+const label = (collection === 'projects' || collection === 'project') ? 'Project' : 'Post';
 ---
 
 <Section
@@ -75,20 +67,20 @@ const label = collection === 'projects' ? 'Project' : 'Post';
   <!-- Intro -->
   <div class="flex flex-col gap-4">
     {tagline && (
-    <p class="text-sm text-gray-500 uppercase tracking-wide">{tagline}</p>
+    <p class="text-xl text-gray-500 uppercase tracking-wide">{tagline}</p>
     )}
     {headline && (
-    <h4 class="text-3xl lg:text-5xl font-semibold leading-tight text-gray-900">
+    <h4 class=" desc-title text-5xl md:text-[5vw] leading-[.89]  uppercase font-light ">
       {headline}
     </h4>
     )}
   </div>
 
   <!-- Layout Components -->
-  {layouts === 'mason' && <MasonGrid posts={normalized} base={collection === 'projects' ? 'project' : 'post'} />}
-  {layouts === 'parallax' && <ParallaxGrid posts={normalized} base={collection === 'projects' ? 'project' : 'post'} />}
-  {layouts === 'carousel' && <CarouselGrid posts={normalized} base={collection === 'projects' ? 'project' : 'post'} />}
-  {layouts === 'list' && <Table posts={normalized} base={collection === 'projects' ? 'project' : 'post'} />}
+  {layouts === 'mason' && <MasonGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
+  {layouts === 'parallax' && <ParallaxGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
+  {layouts === 'carousel' && <CarouselGrid posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
+  {layouts === 'list' && <Table posts={normalized} base={(collection === 'projects' || collection === 'project') ? 'project' : 'post'} />}
 
   <!-- View All Button -->
   <div class="mt-12">
