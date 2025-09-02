@@ -12,7 +12,9 @@ const { headline, tagline, limit, collection, layouts } = props;
 
 // Show controls only on actual blog/projects pages, not when used as a block on other pages
 const currentPath = Astro.url?.pathname || '/';
-const isBlogOrProjectsPage = currentPath === '/blog' || currentPath === '/projects';
+const isBlogOrProjectsPage = currentPath === '/blog' || currentPath === '/blog/' || currentPath === '/projects' || currentPath === '/projects/';
+
+
 
 // Ensure we have a default layout for blog/projects pages
 const defaultLayout = isBlogOrProjectsPage ? 'mason' : (layouts || 'mason');
@@ -101,6 +103,7 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
         </p>
       </div>
     </div> -->
+  </div>
 
   <!-- Controls Section - Only show on blog/projects pages -->
   {isBlogOrProjectsPage && (
@@ -191,6 +194,8 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
           <p class="text-sm mt-2">Is Blog/Projects Page: {isBlogOrProjectsPage ? 'Yes' : 'No'}</p>
         </div>
       )}
+      
+
     </div>
   </div>
 
@@ -278,6 +283,5 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
       }
     });
   </script>
-  </Section>
-  </Section>
+</Section>
 

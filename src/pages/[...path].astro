@@ -37,6 +37,7 @@ export const getStaticPaths = (async() => {
     },
     props: project as Projects 
   }));
+
   return [...pagePaths, ...postPaths, ...projectPath];
 
 
@@ -65,5 +66,6 @@ const isPage = !postSlug === !projectSlug;
   { projectSlug && (
     <ProjectBuilder  {...props} />
   )}
+
   </Layout>
 
