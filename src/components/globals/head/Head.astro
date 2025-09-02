@@ -43,7 +43,14 @@ if (seo?.og_image) {
 const pageUrl = globals?.url || "https://judahsullivan.dev";
 
 // Handle favicon with fileUrl if globals exist
-const  favIcon = await fileUrl(globals?.favicon?.id);
+let favIcon = "/favicon.svg";
+if (globals?.favicon?.id) {
+  try {
+    favIcon = await fileUrl(globals.favicon.id);
+  } catch (error) {
+    favIcon = "/favicon.svg";
+  }
+}
 ---
 <head>
   <MetaTag charset="UTF-8"/>
