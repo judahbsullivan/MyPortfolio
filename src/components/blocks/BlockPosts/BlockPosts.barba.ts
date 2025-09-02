@@ -202,7 +202,8 @@ function initializePostsInteractivity() {
   });
 
   // Set initial layout based on the component prop
-  const initialLayout = el.getAttribute('data-initial-layout') || 'mason';
+  const postsBlock = document.querySelector("#posts-block");
+  const initialLayout = postsBlock?.getAttribute('data-initial-layout') || 'mason';
 
   
   // Set initial layout
@@ -320,8 +321,6 @@ function initializePostsInteractivity() {
       '.post-row',
       '.break-inside-avoid'
     ]);
-    
-  
   }
 }
 
@@ -369,35 +368,7 @@ function animateTableRows() {
   );
 }
 
-function initializeTablePreview() {
-  const tableWrap = document.getElementById('posts-table-wrap');
-  const preview = document.getElementById('post-preview');
-  const slider = document.getElementById('post-preview-slider');
-  const frame = document.getElementById('post-preview-frame');
 
-  if (!tableWrap || !preview || !slider || !frame) {
-    return;
-  }
-
-  // Prevent double initialization
-  if ((window as any)._tablePreviewInitialized) {
-    return;
-  }
-  (window as any)._tablePreviewInitialized = true;
-
-  // Remove existing event listeners to prevent conflicts
-  if ((tableWrap as any)._previewBound) {
-    // Remove old event listeners if they exist
-    const oldRows = tableWrap.querySelectorAll('.post-row');
-    oldRows.forEach(row => {
-      row.removeEventListener('mouseenter', (row as any)._mouseenterHandler);
-    });
-    tableWrap.removeEventListener('mouseenter', (tableWrap as any)._mouseenterHandler);
-    tableWrap.removeEventListener('mouseleave', (tableWrap as any)._mouseleaveHandler);
-    tableWrap.removeEventListener('mousemove', (tableWrap as any)._mousemoveHandler);
-  }
-
-  // Mark as bound
   (tableWrap as any)._previewBound = true;
 
   const rows = tableWrap.querySelectorAll('.post-row');
