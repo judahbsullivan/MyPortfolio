@@ -1,0 +1,29 @@
+---
+import { Icon as AstroIcon } from 'astro-icon/components';
+
+interface Props {
+  name: string;
+  size?: string | number;
+  class?: string;
+  color?: string;
+}
+
+const { name, size = 24, class: className = '', color } = Astro.props;
+
+// Handle different icon set formats
+const iconName = name.includes(':') ? name : `lucide:${name}`;
+---
+
+<AstroIcon 
+  name={iconName} 
+  size={size} 
+  class={`icon ${className}`}
+  style={color ? `color: ${color};` : ''}
+/>
+
+<style>
+  .icon {
+    display: inline-block;
+    vertical-align: middle;
+  }
+</style>

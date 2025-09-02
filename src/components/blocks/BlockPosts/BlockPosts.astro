@@ -6,6 +6,7 @@ import MasonGrid from '@/components/ui/MasonGrid.astro';
 import Table from '@/components/ui/Table.astro';
 import ParallaxGrid from '@/components/ui/ParallaxGrid.astro';
 import CarouselGrid from '@/components/ui/CarouselGrid.astro';
+import Icon from '@/components/ui/Icon.astro';
 
 const props = Astro.props as BlockPosts;
 const { headline, tagline, limit, collection, layouts } = props;
@@ -136,29 +137,37 @@ const mockCategories = ['Design', 'Development', 'Tutorial', 'News'];
           </div>
           <div class="flex items-center gap-2 bg-gray-200 rounded-lg p-1 overflow-x-auto">
             <button 
-              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors ${defaultLayout === 'mason' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${defaultLayout === 'mason' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
               data-layouts="mason"
+              title="Grid Layout"
             >
-              Grid
+              <Icon name="lucide:grid-3x3" size="16" />
+              <span class="hidden sm:inline">Grid</span>
             </button>
             <button 
-              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors ${defaultLayout === 'table' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${defaultLayout === 'table' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
               data-layouts="table"
               data-desktop-only="true"
+              title="Table Layout"
             >
-              Table
+              <Icon name="lucide:table" size="16" />
+              <span class="hidden sm:inline">Table</span>
             </button>
             <button 
-              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors ${defaultLayout === 'parallax' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${defaultLayout === 'parallax' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
               data-layouts="parallax"
+              title="Parallax Layout"
             >
-              Parallax
+              <Icon name="lucide:layers" size="16" />
+              <span class="hidden sm:inline">Parallax</span>
             </button>
             <button 
-              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors ${defaultLayout === 'carousel' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+              class={`layouts-btn px-3 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${defaultLayout === 'carousel' ? 'active bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
               data-layouts="carousel"
+              title="Carousel Layout"
             >
-              Carousel
+              <Icon name="lucide:move-horizontal" size="16" />
+              <span class="hidden sm:inline">Carousel</span>
             </button>
           </div>
         </div>
